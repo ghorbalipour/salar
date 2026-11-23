@@ -1,50 +1,60 @@
 (function () {
   "use strict";
 
+  // کلید ذخیره‌سازی سازگار با نسخه قبلی فارسی ششم تا پیشرفت‌های قبلی حفظ شود
   const STORAGE_KEY = "farsi6_emla_app_v1";
-  const THEME_KEY = "farsi6_emla_theme_v1";
+  const THEME_KEY = "salar_theme_v1";
   const AUTO_NEXT_DELAY_MS = 500;
-  const lessons = window.LESSONS_DATA || [];
 
-  // نگاشت سریع همه سؤالات با شناسه
-  const questionMap = new Map();
-  lessons.forEach((lesson) => {
-    lesson.spelling.forEach((q) =>
-      questionMap.set(q.id, { ...q, lessonId: lesson.id, lessonTitle: lesson.title, mode: "spelling" })
-    );
-    lesson.meaning.forEach((q) =>
-      questionMap.set(q.id, { ...q, lessonId: lesson.id, lessonTitle: lesson.title, mode: "meaning" })
-    );
-  });
+  // فهرست ۶ مقطع ابتدایی — هر زمان فایل data/gradeX.js را آماده کردید، ready را به true تغییر دهید
+  const GRADES = [
+    { id: "grade1", title: "پایه اول ابتدایی", shortTitle: "فارسی اول", file: "data/grade1.js", ready: false },
+    { id: "grade2", title: "پایه دوم ابتدایی", shortTitle: "فارسی دوم", file: "data/grade2.js", ready: false },
+    { id: "grade3", title: "پایه سوم ابتدایی", shortTitle: "فارسی سوم", file: "data/grade3.js", ready: false },
+    { id: "grade4", title: "پایه چهارم ابتدایی", shortTitle: "فارسی چهارم", file: "data/grade4.js", ready: false },
+	{ id: "grade5", title: "پایه پنجم ابتدایی", shortTitle: "فارسی پنجم", file: "data/grade5.js", ready: true },
+    { id: "grade6", title: "پایه ششم ابتدایی", shortTitle: "فارسی ششم", file: "data/grade6.js", ready: true }
+  ];
 
-  // وضعیت ذخیره شده کاربر
+  window.SALAR_DATA = window.SALAR_DATA || {};
+  const loadedScripts = new Set();
+
   let state = loadState();
   let currentTheme = loadTheme();
-  let selectedLesson = null; // null یعنی در صفحه اصلی هستیم
+  let activeGrade = null;   // شیء پایه انتخاب‌شده
+  let selectedLesson = null; // id درس یا "all"
+  let currentLessons = [];
+  let questionMap = new Map();
   let currentQuestionIndex = 0;
   let isAnswered = false;
+  let lastFinishedSession = null;
   let toastTimer = null;
   let autoNextTimer = null;
 
-  // عناصر صفحه
   const el = {
-    mainTitle: document.getElementById("main-title"),
+    navBrand: document.getElementById("nav-brand"),
+    navBtns: document.querySelectorAll(".nav-btn"),
     btnThemeToggle: document.getElementById("btn-theme-toggle"),
-    btnGlobalHome: document.getElementById("btn-global-home"),
-    bottomHomeBtns: document.querySelectorAll(".js-go-home"),
 
-    homeView: document.getElementById("home-view"),
+    pageTitle: document.getElementById("page-title"),
+    btnTopBack: document.getElementById("btn-top-back"),
+
+    gradesView: document.getElementById("grades-view"),
+    gradeHomeView: document.getElementById("grade-home-view"),
     lessonView: document.getElementById("lesson-view"),
     quizView: document.getElementById("quiz-view"),
     resultView: document.getElementById("result-view"),
+    aboutView: document.getElementById("about-view"),
+    namingView: document.getElementById("naming-view"),
 
     resumeCard: document.getElementById("resume-card"),
     resumeText: document.getElementById("resume-text"),
     btnResume: document.getElementById("btn-resume"),
     btnDiscardSession: document.getElementById("btn-discard-session"),
 
+    gradesGrid: document.getElementById("grades-grid"),
     lessonsGrid: document.getElementById("lessons-grid"),
-    btnHomeResetAll: document.getElementById("btn-home-reset-all"),
+    btnGradeResetAll: document.getElementById("btn-grade-reset-all"),
 
     statSpTotal: document.getElementById("stat-sp-total"),
     statSpOk: document.getElementById("stat-sp-ok"),
@@ -81,14 +91,15 @@
     btnRetryMistakes: document.getElementById("btn-retry-mistakes"),
     btnResultLesson: document.getElementById("btn-result-lesson"),
 
+    goGradesBtns: document.querySelectorAll(".js-go-grades"),
+    goGradeHomeBtns: document.querySelectorAll(".js-go-grade-home"),
     toast: document.getElementById("toast")
   };
 
-  // --- مدیریت تم (تیره پیش‌فرض / روشن انتخابی) ---
+  // --- مدیریت تم ---
   function loadTheme() {
     try {
-      const saved = localStorage.getItem(THEME_KEY);
-      return saved === "light" ? "light" : "dark";
+      return localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
     } catch {
       return "dark";
     }
@@ -100,14 +111,12 @@
     el.btnThemeToggle.textContent = currentTheme === "dark" ? "☀️ تم روشن" : "🌙 تم تیره";
     try {
       localStorage.setItem(THEME_KEY, currentTheme);
-    } catch {
-      // نادیده گرفتن خطای ذخیره تم
-    }
+    } catch {}
   }
 
-  // --- مدیریت حافظه خودکار ---
+  // --- مدیریت حافظه ---
   function defaultState() {
-    return { version: 1, stats: {}, activeSession: null };
+    return { version: 2, stats: {}, activeSession: null };
   }
 
   function loadState() {
@@ -116,7 +125,7 @@
       if (!raw) return defaultState();
       const parsed = JSON.parse(raw);
       return {
-        version: 1,
+        version: 2,
         stats: parsed.stats && typeof parsed.stats === "object" ? parsed.stats : {},
         activeSession: parsed.activeSession || null
       };
@@ -137,7 +146,7 @@
     el.toast.textContent = msg;
     el.toast.classList.remove("hidden");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.toast.classList.add("hidden"), 2400);
+    toastTimer = setTimeout(() => el.toast.classList.add("hidden"), 2500);
   }
 
   function clearAutoNext() {
@@ -156,9 +165,47 @@
     return copy;
   }
 
+  // --- بارگذاری پویای فایل داده‌ی هر پایه (سازگار با آنلاین و اجرای آفلاین روی هارد) ---
+  function loadGradeData(grade) {
+    return new Promise((resolve, reject) => {
+      if (Array.isArray(window.SALAR_DATA[grade.id])) {
+        resolve(window.SALAR_DATA[grade.id]);
+        return;
+      }
+      if (loadedScripts.has(grade.file)) {
+        resolve(window.SALAR_DATA[grade.id] || []);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = grade.file;
+      script.onload = () => {
+        loadedScripts.add(grade.file);
+        if (Array.isArray(window.SALAR_DATA[grade.id])) {
+          resolve(window.SALAR_DATA[grade.id]);
+        } else {
+          reject(new Error("داده‌ای در فایل پایه یافت نشد."));
+        }
+      };
+      script.onerror = () => reject(new Error("فایل این پایه هنوز اضافه نشده است."));
+      document.body.appendChild(script);
+    });
+  }
+
+  function buildQuestionMap(lessonsList) {
+    questionMap = new Map();
+    lessonsList.forEach((lesson) => {
+      lesson.spelling.forEach((q) =>
+        questionMap.set(q.id, { ...q, lessonId: lesson.id, lessonTitle: lesson.title, mode: "spelling" })
+      );
+      lesson.meaning.forEach((q) =>
+        questionMap.set(q.id, { ...q, lessonId: lesson.id, lessonTitle: lesson.title, mode: "meaning" })
+      );
+    });
+  }
+
   function getQuestionsForScope(scope, mode) {
     const list = [];
-    lessons.forEach((l) => {
+    currentLessons.forEach((l) => {
       if (scope === "all" || l.id === scope) {
         l[mode].forEach((q) => list.push(q.id));
       }
@@ -168,7 +215,7 @@
 
   function getScopeLabel(scope) {
     if (scope === "all") return "همه درس‌ها";
-    const found = lessons.find((l) => l.id === scope);
+    const found = currentLessons.find((l) => l.id === scope);
     return found ? found.title : "درس";
   }
 
@@ -187,47 +234,115 @@
     return { total: allIds.length, ok, wrong };
   }
 
-  function updateHeader(scope) {
-    if (!scope) {
-      el.mainTitle.textContent = "تمرین املا و معنی فارسی ششم";
-      document.title = "فارسی ششم";
-      el.btnGlobalHome.classList.add("hidden");
+  // --- کنترل نمایش صفحه‌ها و منوی بالا ---
+  function setActiveNav(navName) {
+    el.navBtns.forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.nav === navName);
+    });
+  }
+
+  function showView(viewName) {
+    el.gradesView.classList.toggle("hidden", viewName !== "grades");
+    el.gradeHomeView.classList.toggle("hidden", viewName !== "gradeHome");
+    el.lessonView.classList.toggle("hidden", viewName !== "lesson");
+    el.quizView.classList.toggle("hidden", viewName !== "quiz");
+    el.resultView.classList.toggle("hidden", viewName !== "result");
+    el.aboutView.classList.toggle("hidden", viewName !== "about");
+    el.namingView.classList.toggle("hidden", viewName !== "naming");
+  }
+
+  function configureHeader(title, tabTitle, backLabel, backHandler) {
+    el.pageTitle.textContent = title;
+    document.title = tabTitle;
+    if (backLabel && backHandler) {
+      el.btnTopBack.textContent = backLabel;
+      el.btnTopBack.onclick = backHandler;
+      el.btnTopBack.classList.remove("hidden");
     } else {
-      const label = getScopeLabel(scope);
-      el.mainTitle.textContent = `تمرین املا و معنی فارسی ششم — ${label}`;
-      document.title = label;
-      el.btnGlobalHome.classList.remove("hidden");
+      el.btnTopBack.classList.add("hidden");
+      el.btnTopBack.onclick = null;
     }
   }
 
-  // --- نمایش صفحه‌ها ---
-  function showView(name) {
-    el.homeView.classList.toggle("hidden", name !== "home");
-    el.lessonView.classList.toggle("hidden", name !== "lesson");
-    el.quizView.classList.toggle("hidden", name !== "quiz");
-    el.resultView.classList.toggle("hidden", name !== "result");
-  }
-
-  // --- صفحه اصلی: دکمه «همه درس‌ها» با استایل یکدست + دکمه‌های ۱۷ درس همراه با دکمه ریست کوچک ---
-  function renderHome() {
+  // --- ۱. صفحه انتخاب مقطع ---
+  function renderGrades() {
     clearAutoNext();
-    selectedLesson = null;
-    updateHeader(null);
+    setActiveNav("grades");
+    configureHeader("انتخاب مقطع تحصیلی", "سالار — مقاطع تحصیلی", null, null);
 
     const s = state.activeSession;
     if (s && Array.isArray(s.queue) && s.currentIndex < s.queue.length) {
+      const gradeObj = GRADES.find((g) => g.id === (s.gradeId || "grade6"));
+      const gradeName = gradeObj ? gradeObj.shortTitle : "فارسی ششم";
       const modeName = s.mode === "spelling" ? "بخش املا" : "بخش معنی لغات";
       const reviewTag = s.reviewOnly ? " (مرور اشتباهات)" : "";
       el.resumeText.textContent =
-        `${getScopeLabel(s.lessonScope)} • ${modeName}${reviewTag} • سؤال ${s.currentIndex + 1} از ${s.queue.length}`;
+        `${gradeName} • ${modeName}${reviewTag} • سؤال ${s.currentIndex + 1} از ${s.queue.length}`;
       el.resumeCard.classList.remove("hidden");
     } else {
       el.resumeCard.classList.add("hidden");
     }
 
+    el.gradesGrid.innerHTML = "";
+    GRADES.forEach((grade) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "grade-card-btn";
+      btn.disabled = !grade.ready;
+
+      const statusBadge = grade.ready
+        ? `<span class="badge badge-blue">آماده تمرین</span>`
+        : `<span class="badge badge-muted">به‌زودی</span>`;
+
+      btn.innerHTML = `
+        ${statusBadge}
+        <span class="grade-title">${grade.title}</span>
+        <span class="grade-meta">${grade.shortTitle}</span>
+      `;
+      if (grade.ready) {
+        btn.addEventListener("click", () => openGrade(grade.id));
+      }
+      el.gradesGrid.appendChild(btn);
+    });
+
+    showView("grades");
+  }
+
+  // --- ۲. صفحه درس‌های یک مقطع ---
+  function openGrade(gradeId) {
+    clearAutoNext();
+    const grade = GRADES.find((g) => g.id === gradeId);
+    if (!grade || !grade.ready) {
+      showToast("محتوای این پایه به‌زودی اضافه می‌شود.");
+      return;
+    }
+
+    loadGradeData(grade)
+      .then((lessonsList) => {
+        activeGrade = grade;
+        selectedLesson = null;
+        currentLessons = lessonsList;
+        buildQuestionMap(currentLessons);
+        renderGradeHome();
+      })
+      .catch((err) => {
+        showToast(err.message || "خطا در بارگذاری داده‌های پایه.");
+      });
+  }
+
+  function renderGradeHome() {
+    clearAutoNext();
+    setActiveNav("grades");
+    configureHeader(
+      `تمرین املا و معنی ${activeGrade.shortTitle}`,
+      activeGrade.shortTitle,
+      "تغییر مقطع",
+      renderGrades
+    );
+
     el.lessonsGrid.innerHTML = "";
 
-    // ۱. دکمه «همه درس‌ها» با عرض دو برابر در بالای بقیه دکمه‌ها و استایل یکدست
+    // دکمه «همه درس‌ها» با عرض دو برابر و استایل یکدست
     const allCounts = getCombinedCounts("all");
     const allItem = document.createElement("div");
     allItem.className = "lesson-item lesson-item-all";
@@ -253,8 +368,8 @@
     allItem.appendChild(btnAllMain);
     el.lessonsGrid.appendChild(allItem);
 
-    // ۲. دکمه ۱۷ درس به همراه دکمه ریست کوچک کنار عنوان هر درس
-    lessons.forEach((lesson) => {
+    // دکمه‌های تک‌تک درس‌ها همراه با دکمه ریست کوچک
+    currentLessons.forEach((lesson) => {
       const counts = getCombinedCounts(lesson.id);
       const item = document.createElement("div");
       item.className = "lesson-item";
@@ -293,21 +408,27 @@
       el.lessonsGrid.appendChild(item);
     });
 
-    showView("home");
+    showView("gradeHome");
   }
 
-  // --- صفحه داخلی درس ---
+  // --- ۳. صفحه داخلی درس ---
   function openLesson(scope) {
     clearAutoNext();
     selectedLesson = scope;
-    updateHeader(selectedLesson);
+    const label = getScopeLabel(scope);
+    configureHeader(
+      `${activeGrade.shortTitle} — ${label}`,
+      label,
+      "بازگشت به فهرست درس‌ها",
+      renderGradeHome
+    );
 
     updateModeStats("spelling", el.statSpTotal, el.statSpOk, el.statSpWrong, el.cntSpWrong, el.btnReviewSpelling);
     updateModeStats("meaning", el.statMnTotal, el.statMnOk, el.statMnWrong, el.cntMnWrong, el.btnReviewMeaning);
 
-    const isAllLessons = selectedLesson === "all";
-    el.btnResetLesson.classList.toggle("hidden", isAllLessons);
-    el.btnResetAll.classList.toggle("hidden", !isAllLessons);
+    const isAll = selectedLesson === "all";
+    el.btnResetLesson.classList.toggle("hidden", isAll);
+    el.btnResetAll.classList.toggle("hidden", !isAll);
 
     showView("lesson");
   }
@@ -329,10 +450,10 @@
     reviewBtn.classList.toggle("hidden", wrong === 0);
   }
 
-  // --- شروع و ادامه آزمون ---
+  // --- ۴. آزمون ---
   function startQuiz(mode, reviewOnly) {
     clearAutoNext();
-    if (!selectedLesson) return;
+    if (!activeGrade || !selectedLesson) return;
 
     let ids = getQuestionsForScope(selectedLesson, mode);
     if (reviewOnly) {
@@ -345,6 +466,7 @@
     }
 
     state.activeSession = {
+      gradeId: activeGrade.id,
       lessonScope: selectedLesson,
       mode: mode,
       reviewOnly: reviewOnly,
@@ -356,7 +478,6 @@
     };
 
     currentQuestionIndex = 0;
-    updateHeader(selectedLesson);
     saveState();
     renderQuestion();
     showView("quiz");
@@ -367,19 +488,37 @@
     const s = state.activeSession;
     if (!s || !Array.isArray(s.queue)) return;
 
-    s.queue = s.queue.filter((id) => questionMap.has(id));
-    if (s.currentIndex >= s.queue.length) {
+    const gradeId = s.gradeId || "grade6";
+    const grade = GRADES.find((g) => g.id === gradeId);
+    if (!grade || !grade.ready) {
       state.activeSession = null;
       saveState();
-      renderHome();
+      renderGrades();
       return;
     }
 
-    selectedLesson = s.lessonScope;
-    updateHeader(selectedLesson);
-    currentQuestionIndex = s.currentIndex;
-    renderQuestion();
-    showView("quiz");
+    loadGradeData(grade)
+      .then((lessonsList) => {
+        activeGrade = grade;
+        currentLessons = lessonsList;
+        buildQuestionMap(currentLessons);
+
+        s.queue = s.queue.filter((id) => questionMap.has(id));
+        if (s.currentIndex >= s.queue.length) {
+          state.activeSession = null;
+          saveState();
+          renderGradeHome();
+          return;
+        }
+
+        selectedLesson = s.lessonScope;
+        currentQuestionIndex = s.currentIndex;
+        renderQuestion();
+        showView("quiz");
+      })
+      .catch(() => {
+        showToast("خطا در بازیابی آزمون نیمه‌کاره.");
+      });
   }
 
   function renderQuestion() {
@@ -393,13 +532,20 @@
     }
 
     isAnswered = false;
+    const scopeLabel = getScopeLabel(s.lessonScope);
+    configureHeader(
+      `${activeGrade.shortTitle} — ${scopeLabel}`,
+      scopeLabel,
+      "بازگشت به فهرست درس‌ها",
+      renderGradeHome
+    );
+
     const modeLabel = s.mode === "spelling" ? "املا" : "معنی لغات";
     el.quizTitle.textContent = s.reviewOnly ? `مرور اشتباهات ${modeLabel}` : `تمرین ${modeLabel}`;
     el.quizProgressText.textContent = `سؤال ${currentQuestionIndex + 1} از ${s.queue.length}`;
     el.progressBar.style.width = `${(currentQuestionIndex / s.queue.length) * 100}%`;
 
     el.btnBackLesson.textContent = s.lessonScope === "all" ? "برگشت به همه درس‌ها" : "برگشت به درس";
-
     el.questionLessonTag.textContent = q.lessonTitle;
     el.questionPrompt.textContent = q.prompt;
 
@@ -503,8 +649,6 @@
     }
   }
 
-  let lastFinishedSession = null;
-
   function finishSession() {
     clearAutoNext();
     const s = state.activeSession;
@@ -543,23 +687,28 @@
     openLesson(targetScope);
   }
 
-  function goHome() {
+  // --- صفحات درباره و نام‌گذاری ---
+  function renderAbout() {
     clearAutoNext();
-    const s = state.activeSession;
-    if (s && s.currentIndex >= s.queue.length) {
-      state.activeSession = null;
-    }
-    saveState();
-    renderHome();
+    setActiveNav("about");
+    configureHeader("درباره نرم‌افزار سالار", "درباره سالار", "مقاطع تحصیلی", renderGrades);
+    showView("about");
+  }
+
+  function renderNaming() {
+    clearAutoNext();
+    setActiveNav("naming");
+    configureHeader("نام‌گذاری نرم‌افزار سالار", "نام‌گذاری سالار", "مقاطع تحصیلی", renderGrades);
+    showView("naming");
   }
 
   // --- ریست ---
-  function resetLessonById(lessonId, stayOnHome) {
+  function resetLessonById(lessonId, stayOnGradeHome) {
     if (!lessonId || lessonId === "all") return;
     const title = getScopeLabel(lessonId);
     if (!confirm(`آیا مطمئن هستید اطلاعات «${title}» به حالت اولیه برگردد؟`)) return;
 
-    const lesson = lessons.find((l) => l.id === lessonId);
+    const lesson = currentLessons.find((l) => l.id === lessonId);
     if (lesson) {
       lesson.spelling.forEach((q) => delete state.stats[q.id]);
       lesson.meaning.forEach((q) => delete state.stats[q.id]);
@@ -569,33 +718,55 @@
     }
     saveState();
 
-    if (stayOnHome) {
-      renderHome();
+    if (stayOnGradeHome) {
+      renderGradeHome();
     } else {
       openLesson(lessonId);
     }
     showToast(`اطلاعات ${title} ریست شد.`);
   }
 
-  function resetAllLessons(stayOnHome) {
-    if (!confirm("آیا مطمئن هستید پیشرفت همه درس‌ها پاک شود و به حالت اولیه برگردد؟")) return;
-    state = defaultState();
+  function resetCurrentGrade(stayOnGradeHome) {
+    if (!activeGrade) return;
+    if (!confirm(`آیا مطمئن هستید پیشرفت همه درس‌های «${activeGrade.shortTitle}» پاک شود؟`)) return;
+
+    currentLessons.forEach((lesson) => {
+      lesson.spelling.forEach((q) => delete state.stats[q.id]);
+      lesson.meaning.forEach((q) => delete state.stats[q.id]);
+    });
+    if (state.activeSession && (state.activeSession.gradeId || "grade6") === activeGrade.id) {
+      state.activeSession = null;
+    }
     saveState();
-    if (stayOnHome) {
-      renderHome();
+
+    if (stayOnGradeHome) {
+      renderGradeHome();
     } else {
       openLesson("all");
     }
-    showToast("اطلاعات همه درس‌ها ریست شد.");
+    showToast(`اطلاعات ${activeGrade.shortTitle} ریست شد.`);
   }
 
   // --- رویدادها ---
+  el.navBrand.addEventListener("click", renderGrades);
+  el.navBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.nav;
+      if (target === "grades") renderGrades();
+      else if (target === "about") renderAbout();
+      else if (target === "naming") renderNaming();
+    });
+  });
+
   el.btnThemeToggle.addEventListener("click", () => {
     applyTheme(currentTheme === "dark" ? "light" : "dark");
   });
 
-  el.btnGlobalHome.addEventListener("click", goHome);
-  el.bottomHomeBtns.forEach((btn) => btn.addEventListener("click", goHome));
+  el.goGradesBtns.forEach((b) => b.addEventListener("click", renderGrades));
+  el.goGradeHomeBtns.forEach((b) => b.addEventListener("click", () => {
+    if (activeGrade) renderGradeHome();
+    else renderGrades();
+  }));
 
   el.btnBackLesson.addEventListener("click", backToCurrentLesson);
   el.btnResultLesson.addEventListener("click", backToCurrentLesson);
@@ -609,7 +780,7 @@
   el.btnDiscardSession.addEventListener("click", () => {
     state.activeSession = null;
     saveState();
-    renderHome();
+    renderGrades();
   });
 
   el.btnNext.addEventListener("click", nextQuestion);
@@ -620,9 +791,9 @@
     startQuiz(lastFinishedSession.mode, true);
   });
 
-  el.btnHomeResetAll.addEventListener("click", () => resetAllLessons(true));
+  el.btnGradeResetAll.addEventListener("click", () => resetCurrentGrade(true));
   el.btnResetLesson.addEventListener("click", () => resetLessonById(selectedLesson, false));
-  el.btnResetAll.addEventListener("click", () => resetAllLessons(false));
+  el.btnResetAll.addEventListener("click", () => resetCurrentGrade(false));
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !el.quizView.classList.contains("hidden") && isAnswered && !el.btnNext.classList.contains("hidden")) {
@@ -630,7 +801,6 @@
     }
   });
 
-  // اعمال تم پیش‌فرض (تیره) و شروع برنامه
   applyTheme(currentTheme);
-  renderHome();
+  renderGrades();
 })();

@@ -1,7 +1,8 @@
-/* تم پیش‌فرض: تیره (مناسب برای مطالعه طولانی و جلوگیری از خستگی چشم) */
+/* تم پیش‌فرض: تیره */
 :root,
 [data-theme="dark"] {
   --bg: #0f172a;
+  --nav-bg: #162032;
   --surface: #1e293b;
   --surface-hover: #263349;
   --surface-subtle: #162032;
@@ -29,9 +30,10 @@
   --radius: 14px;
 }
 
-/* تم روشن (قابل انتخاب با دکمه بالای صفحه) */
+/* تم روشن */
 [data-theme="light"] {
   --bg: #f4f6f9;
+  --nav-bg: #ffffff;
   --surface: #ffffff;
   --surface-hover: #eff6ff;
   --surface-subtle: #f1f5f9;
@@ -55,7 +57,7 @@
   --ghost-hover: #e2e8f0;
   --toast-bg: #1e293b;
   --toast-text: #ffffff;
-  --shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 * {
@@ -70,39 +72,115 @@ body {
   color: var(--text);
   line-height: 1.8;
   min-height: 100vh;
-  padding: 20px 16px 40px;
+  padding-bottom: 44px;
   transition: background-color 0.2s, color 0.2s;
-}
-
-.container {
-  max-width: 840px;
-  margin: 0 auto;
 }
 
 .hidden {
   display: none !important;
 }
 
-/* نوار بالا */
-.top-bar {
+/* نوار منوی ثابت بالای همه صفحات */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+}
+
+.navbar-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 10px 16px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
 }
 
-.top-bar h1 {
-  font-size: 1.22rem;
+.brand-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.brand-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nav-btn {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.nav-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.nav-btn.active {
+  background: var(--badge-blue-bg);
+  color: var(--badge-blue-text);
+}
+
+/* بدنه اصلی */
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.page-header h1 {
+  font-size: 1.25rem;
   font-weight: 700;
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+.section-subtitle {
+  color: var(--muted);
+  margin-bottom: 14px;
+  font-size: 0.95rem;
 }
 
 /* کارت‌ها */
@@ -115,7 +193,6 @@ body {
   box-shadow: var(--shadow);
 }
 
-/* کارت ادامه نیمه‌کاره */
 .resume-card {
   display: flex;
   flex-wrap: wrap;
@@ -137,7 +214,52 @@ body {
   gap: 8px;
 }
 
-/* شبکه دکمه‌های صفحه اصلی (همه درس‌ها + ۱۷ درس با استایل یکدست) */
+/* شبکه انتخاب مقاطع (اول تا ششم) */
+.grades-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.grade-card-btn {
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 20px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  text-align: right;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+}
+
+.grade-card-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+}
+
+.grade-card-btn:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.grade-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.grade-meta {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+/* شبکه دکمه‌های درس‌ها (همه درس‌ها + درس‌های مقطع با استایل یکدست) */
 .lessons-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -160,7 +282,6 @@ body {
   background: var(--surface-hover);
 }
 
-/* دکمه «همه درس‌ها» با عرض دو برابر در بالای بقیه دکمه‌ها و استایل کاملاً یکدست */
 .lesson-item-all {
   grid-column: 1 / -1;
 }
@@ -263,6 +384,56 @@ body {
   gap: 8px;
 }
 
+/* صفحات درباره و نام‌گذاری */
+.info-card h2,
+.naming-text h2 {
+  font-size: 1.18rem;
+  margin-bottom: 12px;
+}
+
+.info-card p,
+.naming-text p {
+  margin-bottom: 12px;
+}
+
+.info-list {
+  padding-right: 20px;
+  margin-bottom: 14px;
+}
+
+.info-list li {
+  margin-bottom: 6px;
+}
+
+.naming-card {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.naming-photo-wrap {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+}
+
+.naming-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+code {
+  background: var(--surface-subtle);
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 0.86rem;
+}
+
 /* برچسب‌ها */
 .badge {
   display: inline-block;
@@ -286,6 +457,11 @@ body {
   background: var(--warn-bg);
   color: var(--warn-text);
   border: 1px solid var(--warn-border);
+}
+
+.badge-muted {
+  background: var(--surface-subtle);
+  color: var(--muted);
 }
 
 .text-green { color: var(--green); }
@@ -366,10 +542,6 @@ body {
   margin-top: 16px;
 }
 
-.home-bottom-bar {
-  justify-content: flex-end;
-}
-
 /* صفحه آزمون */
 .quiz-header {
   display: flex;
@@ -420,7 +592,6 @@ body {
   line-height: 1.9;
 }
 
-/* چیدمان منعطف گزینه‌ها (۲ تا ۶ گزینه) */
 .options-grid {
   display: grid;
   gap: 12px;
@@ -561,12 +732,33 @@ body {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 680px) {
+  .grades-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .lessons-grid,
-  .modes-grid {
+  .modes-grid,
+  .naming-card {
     grid-template-columns: 1fr;
   }
   .options-grid.cols-3 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+.developer-info {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.info-card a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.info-card a:hover {
+  text-decoration: underline;
+}
+

@@ -1,28 +1,26 @@
-const CACHE_NAME = "farsi6-pwa-v1";
+const CACHE_NAME = "salar-pwa-v4";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
-  "./lessons.js",
-  "./lessons-3-to-6.js",
-  "./lessons-7-to-12.js",
-  "./lessons-13-to-17.js",
   "./manifest.json",
-  "./icon.svg"
+  "./images/icon-192.png",
+  "./images/icon-512.png",
+  "./images/naming.jpg",
+  "./data/grade6.js",
+  "./data/grade5.js"
 ];
 
-// ذخیره اولیه تمام فایل‌ها برای استفاده آفلاین
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(ASSETS.map((url) => cache.add(url)))
+      Promise.allSettled(CORE_ASSETS.map((url) => cache.add(url)))
     )
   );
 });
 
-// فعال‌سازی فوری نسخه جدید
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -31,7 +29,6 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// استراتژی Network-First: در حالت آنلاین همیشه فایل جدید را می‌گیرد و کش را آپدیت می‌کند؛ در حالت آفلاین از کش می‌خواند
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(

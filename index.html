@@ -3,25 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>فارسی ششم</title>
+  <meta name="description" content="نرم‌افزار آموزشی سالار؛ تمرین تعاملی املا و معنی لغات فارسی اول تا ششم دبستان به صورت آفلاین و قابل نصب.">
   <meta name="theme-color" content="#0f172a">
+  <title>سالار — تمرین املا و معنی فارسی دبستان</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="icon" href="images/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="images/icon-192.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <!-- نوار بالا (ثابت در همه صفحات) -->
-    <header class="top-bar">
-      <h1 id="main-title">تمرین املا و معنی فارسی ششم</h1>
-      <div class="header-actions">
+  <!-- منوی ثابت بالای همه صفحات -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <button id="nav-brand" class="brand-btn" type="button" title="صفحه انتخاب مقاطع">
+        <img src="images/icon-192.png" alt="لوگوی سالار" class="brand-logo">
+        <span class="brand-name">سالار</span>
+      </button>
+
+      <div class="nav-links">
+        <button class="nav-btn active" data-nav="grades" type="button">مقاطع تحصیلی</button>
+        <button class="nav-btn" data-nav="about" type="button">درباره</button>
+        <button class="nav-btn" data-nav="naming" type="button">نام‌گذاری نرم‌افزار</button>
         <button id="btn-theme-toggle" class="btn btn-outline btn-sm" type="button">☀️ تم روشن</button>
-        <button id="btn-global-home" class="btn btn-outline btn-sm hidden" type="button">بازگشت به صفحه اصلی</button>
       </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- نوار عنوان صفحه فعلی -->
+    <header class="page-header">
+      <h1 id="page-title">انتخاب مقطع تحصیلی</h1>
+      <button id="btn-top-back" class="btn btn-outline btn-sm hidden" type="button">بازگشت</button>
     </header>
 
-    <!-- صفحه اصلی -->
-    <main id="home-view">
+    <!-- ۱. صفحه انتخاب مقطع (اول تا ششم ابتدایی) -->
+    <main id="grades-view">
       <!-- کارت ادامه آزمون نیمه‌کاره -->
       <section id="resume-card" class="card resume-card hidden">
         <div class="resume-info">
@@ -34,19 +50,23 @@
         </div>
       </section>
 
-      <!-- شبکه دکمه‌های انتخاب درس -->
+      <p class="section-subtitle">لطفاً پایه تحصیلی دانش‌آموز را انتخاب کنید:</p>
+      <section id="grades-grid" class="grades-grid"></section>
+    </main>
+
+    <!-- ۲. صفحه فهرست درس‌های مقطع انتخاب‌شده -->
+    <main id="grade-home-view" class="hidden">
       <section id="lessons-grid" class="lessons-grid"></section>
 
-      <!-- نوار پایین صفحه اصلی -->
-      <footer class="page-bottom-bar home-bottom-bar">
-        <button id="btn-home-reset-all" class="btn btn-danger-outline btn-sm" type="button">ریست همه درس‌ها</button>
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-grades" type="button">تغییر مقطع تحصیلی</button>
+        <button id="btn-grade-reset-all" class="btn btn-danger-outline btn-sm" type="button">ریست همه درس‌های این پایه</button>
       </footer>
     </main>
 
-    <!-- صفحه داخلی هر درس (یا بخش همه درس‌ها) -->
+    <!-- ۳. صفحه داخلی هر درس (یا همه درس‌های یک پایه) -->
     <main id="lesson-view" class="hidden">
       <section class="modes-grid">
-        <!-- کارت املا -->
         <div class="card mode-card">
           <div class="mode-header">
             <h2>بخش املا</h2>
@@ -65,7 +85,6 @@
           </div>
         </div>
 
-        <!-- کارت معنی لغات -->
         <div class="card mode-card">
           <div class="mode-header">
             <h2>بخش معنی لغات</h2>
@@ -85,17 +104,16 @@
         </div>
       </section>
 
-      <!-- نوار پایین صفحه درس -->
       <footer class="page-bottom-bar">
-        <button class="btn btn-outline btn-sm js-go-home" type="button">بازگشت به صفحه اصلی</button>
+        <button class="btn btn-outline btn-sm js-go-grade-home" type="button">بازگشت به فهرست درس‌ها</button>
         <div>
           <button id="btn-reset-lesson" class="btn btn-ghost btn-sm text-red" type="button">ریست این درس</button>
-          <button id="btn-reset-all" class="btn btn-ghost btn-sm text-red hidden" type="button">ریست همه درس‌ها</button>
+          <button id="btn-reset-all" class="btn btn-ghost btn-sm text-red hidden" type="button">ریست همه درس‌های این پایه</button>
         </div>
       </footer>
     </main>
 
-    <!-- صفحه آزمون -->
+    <!-- ۴. صفحه آزمون -->
     <main id="quiz-view" class="hidden">
       <div class="quiz-header">
         <div class="quiz-meta">
@@ -122,13 +140,12 @@
         </div>
       </section>
 
-      <!-- نوار پایین صفحه آزمون -->
       <footer class="page-bottom-bar">
-        <button class="btn btn-outline btn-sm js-go-home" type="button">بازگشت به صفحه اصلی</button>
+        <button class="btn btn-outline btn-sm js-go-grade-home" type="button">بازگشت به فهرست درس‌ها</button>
       </footer>
     </main>
 
-    <!-- صفحه پایان آزمون -->
+    <!-- ۵. صفحه پایان آزمون -->
     <main id="result-view" class="hidden">
       <section class="card result-card">
         <h2>پایان تمرین</h2>
@@ -149,9 +166,85 @@
         </div>
       </section>
 
-      <!-- نوار پایین صفحه نتیجه -->
       <footer class="page-bottom-bar">
-        <button class="btn btn-outline btn-sm js-go-home" type="button">بازگشت به صفحه اصلی</button>
+        <button class="btn btn-outline btn-sm js-go-grade-home" type="button">بازگشت به فهرست درس‌ها</button>
+      </footer>
+    </main>
+
+    <!-- ۶. صفحه «درباره نرم‌افزار» -->
+    <main id="about-view" class="hidden">
+     <section class="card info-card">
+        <h2>درباره نرم‌افزار آموزشی «سالار»</h2>
+        <p>
+          نرم‌افزار «سالار» یک برنامه آموزشی ساده، رایگان و قابل اجرا روی گوشی و کامپیوتر است که برای کمک به
+          دانش‌آموزان دوره ابتدایی در یادگیری <strong>املای درست کلمات</strong> و <strong>معنی لغات و اصطلاحات</strong> کتاب فارسی طراحی شده است.
+        </p>
+        <ul class="info-list">
+          <li>پوشش درس‌به‌درس و آزمون جامع از همه درس‌های هر پایه.</li>
+          <li>جداسازی کامل بخش املا از بخش معنی لغات.</li>
+          <li>ثبت خودکار پاسخ‌های نادرست برای مرور هدفمند اشتباهات.</li>
+          <li>ذخیره لحظه‌ای پیشرفت در دستگاه و قابلیت نصب و استفاده آفلاین.</li>
+        </ul>
+        <p class="developer-info">
+          این نرم‌افزار توسط <strong>مهدی قربعلی پوردرو</strong> طراحی و ساخته شده است.<br>
+          پروفایل گیت‌هاب:
+          <a href="https://github.com/ghorbalipour" target="_blank" rel="noopener noreferrer" dir="ltr">
+            github.com/ghorbalipour
+          </a>
+        </p>
+      </section>
+
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-grades" type="button">بازگشت به مقاطع تحصیلی</button>
+      </footer>
+    </main>
+
+    <!-- ۷. صفحه «نام‌گذاری نرم‌افزار» (با کادر اختصاصی عکس) -->
+    <main id="naming-view" class="hidden">
+      <section class="card naming-card">
+        <div class="naming-photo-wrap">
+          <figure class="naming-figure">
+            <img src="images/naming.jpg" alt="شادروان مشهدی سالار ویسانیان" class="naming-photo">
+          </figure>
+		  
+        </div>
+        <div class="naming-text">
+          <h2>چرا نام این نرم‌افزار را «سالار» گذاشته‌ایم؟</h2>
+          <p>
+            نام «سالار» برای این نرم‌افزار، فقط انتخاب یک نام نیست؛ ادای احترامی است به یاد مردی که دانش و آگاهی را ارج می‌نهاد و برای فراهم کردن فرصت آموختن برای کودکان، از اندیشه به عمل رسید.
+          </p>
+          <p>
+            شادروان مشهدی سالار ویسانیان (۱۳۰۰ تا بهمن ۱۳۹۵)، زاده روستای تاریخی دِرَو، از بخش شاهرود شهرستان خلخال، مردی فرهیخته، دانش‌دوست و علاقه‌مند به شعر و ادب بود. او با وجود آنکه از امکانات آموزشی گسترده‌ای برخوردار نبود، به پشتوانه استعداد، هوش سرشار، حافظه نیرومند و تلاش شخصی، به دانشی چشمگیر در حوزه‌های ادبیات، زبان و فرهنگ دست یافت.
+          </p>
+          <p>
+            اما شاید زیباترین بخش زندگی او، عشقی بود که به آموزش کودکان داشت.
+          </p>
+          <p>
+            او در زندگی‌نامه خودنوشتش، از روزی یاد می‌کند که با دیدن نزدیک به دویست کودک در مراسم محرم، اندیشه تأسیس مدرسه‌ای به سبک جدید در ذهنش شکل گرفت. او درباره آن روز چنین نوشته است:
+          </p>
+          <blockquote class="naming-quote">
+            <strong>«با دیدن نزدیک دویست نفر نوباوه در مراسم محرم این انگیزه در من ایجاد شد که این کودکان را باید در مدرسه‌ای تحت تعلیم و تربیت قرار داد. دیگر زمان مکتب‌خانه سپری شده بود.»</strong>
+          </blockquote>
+          <p>
+            این اندیشه برای او تنها یک آرزو باقی نماند. با تلاش و پیگیری‌های فراوان، نامه‌نگاری و همراهی چند تن از دوستان باسواد و معتمدان محل و با مساعدت مسئولان آموزش و پرورش خلخال، سرانجام در پاییز سال ۱۳۲۷، دبستان مرتضوی درو گشایش یافت. نخستین سال تحصیلی این مدرسه نیز با حضور هفتاد دانش‌آموز به پایان رسید.
+          </p>
+          <p>
+            سالار ویسانیان تنها در گسترش آموزش نقش نداشت؛ خود نیز عمری را با مطالعه، شعر، ادبیات و پژوهش سپری کرد. ذوق ادبی و آشنایی چشمگیر او با زبان‌های تاتی، فارسی، ترکی و عربی، در کنار سخن‌دانی، حافظه قوی و دانش گسترده‌اش، او را به چهره‌ای ماندگار در فرهنگ و تاریخ منطقه تبدیل کرد. حتی در سال‌های پایانی عمر نیز دست از مطالعه و آموختن نکشید و به ثبت خاطرات، تنظیم نوشته‌ها و سروده‌ها و پژوهش درباره زبان تاتی پرداخت.
+          </p>
+          <p>
+            امروز نام «سالار» بر این نرم‌افزار آموزشی قرار گرفته است تا یاد و نام این مرد دانش‌دوست زنده بماند و تلاش فرهنگی او در قالبی تازه ادامه پیدا کند. این نرم‌افزار با هدف کمک به دانش‌آموزان پایه‌های اول تا ششم ابتدایی در یادگیری درست‌نویسی، املا و شناخت معنای واژه‌ها و اصطلاحات فارسی طراحی شده است.
+          </p>
+          <p>
+            امیدواریم هر واژه‌ای که کودکی به‌درستی می‌نویسد، هر معنایی که با شوق می‌آموزد و هر قدمی که در راه دانایی برمی‌دارد، یادآور اندیشه مردی باشد که روزگاری برای فراهم کردن امکان تحصیل کودکان سرزمینش تلاش کرد.
+          </p>
+          <p>
+            سالار، نامی به یاد مردی که برای گسترش دانش کوشید؛ تا چراغ دانایی، نسل به نسل روشن بماند.
+          </p>
+        </div>
+      </section>
+
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-grades" type="button">بازگشت به مقاطع تحصیلی</button>
       </footer>
     </main>
   </div>
@@ -159,13 +252,7 @@
   <!-- پیام اطلاع‌رسانی کوتاه -->
   <div id="toast" class="toast hidden"></div>
 
-  <!-- فایل‌های داده‌های تمام ۱۷ درس + منطق برنامه -->
-  <script src="lessons.js"></script>
-  <script src="lessons-3-to-6.js"></script>
-  <script src="lessons-7-to-12.js"></script>
-  <script src="lessons-13-to-17.js"></script>
   <script src="app.js"></script>
-  
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
