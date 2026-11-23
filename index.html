@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فارسی ششم</title>
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- نوار بالا (ثابت در همه صفحات) -->
+    <header class="top-bar">
+      <h1 id="main-title">تمرین املا و معنی فارسی ششم</h1>
+      <div class="header-actions">
+        <button id="btn-theme-toggle" class="btn btn-outline btn-sm" type="button">☀️ تم روشن</button>
+        <button id="btn-global-home" class="btn btn-outline btn-sm hidden" type="button">بازگشت به صفحه اصلی</button>
+      </div>
+    </header>
+
+    <!-- صفحه اصلی -->
+    <main id="home-view">
+      <!-- کارت ادامه آزمون نیمه‌کاره -->
+      <section id="resume-card" class="card resume-card hidden">
+        <div class="resume-info">
+          <span class="badge badge-warn">آزمون نیمه‌کاره</span>
+          <p id="resume-text"></p>
+        </div>
+        <div class="resume-actions">
+          <button id="btn-resume" class="btn btn-primary" type="button">ادامه از همین‌جا</button>
+          <button id="btn-discard-session" class="btn btn-ghost btn-sm" type="button">بستن</button>
+        </div>
+      </section>
+
+      <!-- شبکه دکمه‌های انتخاب درس -->
+      <section id="lessons-grid" class="lessons-grid"></section>
+
+      <!-- نوار پایین صفحه اصلی -->
+      <footer class="page-bottom-bar home-bottom-bar">
+        <button id="btn-home-reset-all" class="btn btn-danger-outline btn-sm" type="button">ریست همه درس‌ها</button>
+      </footer>
+    </main>
+
+    <!-- صفحه داخلی هر درس (یا بخش همه درس‌ها) -->
+    <main id="lesson-view" class="hidden">
+      <section class="modes-grid">
+        <!-- کارت املا -->
+        <div class="card mode-card">
+          <div class="mode-header">
+            <h2>بخش املا</h2>
+            <span class="badge badge-blue">تشخیص نوشتار درست</span>
+          </div>
+          <div class="stats-row">
+            <div>کل سؤالات: <strong id="stat-sp-total">0</strong></div>
+            <div>بلد بوده: <strong id="stat-sp-ok" class="text-green">0</strong></div>
+            <div>نیاز به مرور: <strong id="stat-sp-wrong" class="text-red">0</strong></div>
+          </div>
+          <div class="mode-actions">
+            <button id="btn-start-spelling" class="btn btn-primary btn-block" type="button">شروع تمرین املا</button>
+            <button id="btn-review-spelling" class="btn btn-danger-outline btn-block hidden" type="button">
+              مرور اشتباهات املا (<span id="cnt-sp-wrong">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- کارت معنی لغات -->
+        <div class="card mode-card">
+          <div class="mode-header">
+            <h2>بخش معنی لغات</h2>
+            <span class="badge badge-teal">یادگیری معنای واژه‌ها</span>
+          </div>
+          <div class="stats-row">
+            <div>کل سؤالات: <strong id="stat-mn-total">0</strong></div>
+            <div>بلد بوده: <strong id="stat-mn-ok" class="text-green">0</strong></div>
+            <div>نیاز به مرور: <strong id="stat-mn-wrong" class="text-red">0</strong></div>
+          </div>
+          <div class="mode-actions">
+            <button id="btn-start-meaning" class="btn btn-primary btn-block" type="button">شروع تمرین معنی</button>
+            <button id="btn-review-meaning" class="btn btn-danger-outline btn-block hidden" type="button">
+              مرور اشتباهات معنی (<span id="cnt-mn-wrong">0</span>)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- نوار پایین صفحه درس -->
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-home" type="button">بازگشت به صفحه اصلی</button>
+        <div>
+          <button id="btn-reset-lesson" class="btn btn-ghost btn-sm text-red" type="button">ریست این درس</button>
+          <button id="btn-reset-all" class="btn btn-ghost btn-sm text-red hidden" type="button">ریست همه درس‌ها</button>
+        </div>
+      </footer>
+    </main>
+
+    <!-- صفحه آزمون -->
+    <main id="quiz-view" class="hidden">
+      <div class="quiz-header">
+        <div class="quiz-meta">
+          <span id="quiz-title" class="badge badge-blue"></span>
+          <span id="quiz-progress-text" class="progress-text"></span>
+        </div>
+        <button id="btn-back-lesson" class="btn btn-outline btn-sm" type="button">برگشت به درس</button>
+      </div>
+
+      <div class="progress-track">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+
+      <section class="card question-card">
+        <div id="question-lesson-tag" class="lesson-tag"></div>
+        <p id="question-prompt" class="question-prompt"></p>
+        <div id="options-container" class="options-grid"></div>
+        <div id="feedback-box" class="feedback-box hidden">
+          <strong id="feedback-status"></strong>
+          <span id="feedback-hint"></span>
+        </div>
+        <div class="quiz-footer">
+          <button id="btn-next" class="btn btn-primary hidden" type="button">سؤال بعدی</button>
+        </div>
+      </section>
+
+      <!-- نوار پایین صفحه آزمون -->
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-home" type="button">بازگشت به صفحه اصلی</button>
+      </footer>
+    </main>
+
+    <!-- صفحه پایان آزمون -->
+    <main id="result-view" class="hidden">
+      <section class="card result-card">
+        <h2>پایان تمرین</h2>
+        <p id="result-summary" class="result-summary"></p>
+        <div class="result-stats">
+          <div class="res-box res-ok">
+            <span>پاسخ درست</span>
+            <strong id="res-correct">0</strong>
+          </div>
+          <div class="res-box res-wrong">
+            <span>نیاز به تمرین</span>
+            <strong id="res-wrong">0</strong>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button id="btn-retry-mistakes" class="btn btn-danger-outline hidden" type="button">مرور اشتباهات همین بخش</button>
+          <button id="btn-result-lesson" class="btn btn-primary" type="button">برگشت به درس</button>
+        </div>
+      </section>
+
+      <!-- نوار پایین صفحه نتیجه -->
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-home" type="button">بازگشت به صفحه اصلی</button>
+      </footer>
+    </main>
+  </div>
+
+  <!-- پیام اطلاع‌رسانی کوتاه -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- فایل‌های داده‌های تمام ۱۷ درس + منطق برنامه -->
+  <script src="lessons.js"></script>
+  <script src="lessons-3-to-6.js"></script>
+  <script src="lessons-7-to-12.js"></script>
+  <script src="lessons-13-to-17.js"></script>
+  <script src="app.js"></script>
+  
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
