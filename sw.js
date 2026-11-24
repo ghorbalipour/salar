@@ -1,9 +1,9 @@
-const CACHE_NAME = "salar-pwa-v10";
+const CACHE_NAME = "salar-pwa-v11";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./style.css",
-  "./app.js",
+  "./style.css?v=2.1",
+  "./app.js?v=2.1",
   "./manifest.json",
   "./images/icon-192.png",
   "./images/icon-512.png",
@@ -20,7 +20,13 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(CORE_ASSETS.map((url) => cache.add(url)))
+      Promise.allSettled(
+        CORE_ASSETS.map((url) =>
+          fetch(url, { cache: "no-cache" }).then((res) => {
+            if (res && res.ok) return cache.put(url, res);
+          })
+        )
+      )
     )
   );
 });
@@ -43,14 +49,14 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const reqUrl = new URL(event.request.url);
 
-  // فایل version.json همیشه مستقیم از شبکه خوانده می‌شود تا نسخه جدید دقیق تشخیص داده شود
+  // فایل version.json همیشه مستقیم از شبکه خوانده می‌شود
   if (reqUrl.pathname.endsWith("/version.json")) {
     event.respondWith(fetch(event.request, { cache: "no-store" }));
     return;
   }
 
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: "no-cache" })
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const copy = networkResponse.clone();
