@@ -30,6 +30,24 @@
   --radius: 14px;
   --base-font-size: 16px;
   --font-scale: 1;
+  /* رنگ‌بندی اختصاصی منوها (متفاوت از دکمه‌های آبی عملیات) */
+  --nav-accent: #2dd4bf;
+  --nav-active-bg: rgba(45, 212, 191, 0.12);
+  --submenu-accent: #8b5cf6;
+  --submenu-accent-deep: #6d28d9;
+  --submenu-soft-bg: rgba(139, 92, 246, 0.11);
+  --submenu-soft-border: rgba(167, 139, 250, 0.45);
+  --submenu-soft-text: #ddd6fe;
+  --submenu-halo-soft: rgba(139, 92, 246, 0.22);
+  --submenu-halo-strong: rgba(124, 58, 237, 0.48);
+  --submenu-ring: rgba(196, 181, 253, 0.35);
+  /* پس‌زمینه کادر عنوان پشتیبان‌گیری و بازیابی */
+  --backup-head-bg: rgba(20, 184, 166, 0.14);
+  --backup-head-border: rgba(45, 212, 191, 0.35);
+  --backup-head-accent: #2dd4bf;
+  --restore-head-bg: rgba(139, 92, 246, 0.15);
+  --restore-head-border: rgba(167, 139, 250, 0.38);
+  --restore-head-accent: #a78bfa;
 }
 
 /* تم روشن */
@@ -60,6 +78,24 @@
   --toast-bg: #1e293b;
   --toast-text: #ffffff;
   --shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  /* رنگ‌بندی اختصاصی منوها در تم روشن */
+  --nav-accent: #0f766e;
+  --nav-active-bg: rgba(15, 118, 110, 0.1);
+  --submenu-accent: #7c3aed;
+  --submenu-accent-deep: #5b21b6;
+  --submenu-soft-bg: rgba(124, 58, 237, 0.07);
+  --submenu-soft-border: rgba(124, 58, 237, 0.32);
+  --submenu-soft-text: #5b21b6;
+  --submenu-halo-soft: rgba(124, 58, 237, 0.14);
+  --submenu-halo-strong: rgba(109, 40, 217, 0.34);
+  --submenu-ring: rgba(124, 58, 237, 0.24);
+  /* پس‌زمینه کادر عنوان پشتیبان‌گیری و بازیابی در تم روشن */
+  --backup-head-bg: #f0fdfa;
+  --backup-head-border: #99f6e4;
+  --backup-head-accent: #0d9488;
+  --restore-head-bg: #f5f3ff;
+  --restore-head-border: #ddd6fe;
+  --restore-head-accent: #7c3aed;
 }
 
 * {
@@ -80,7 +116,7 @@ body {
   color: var(--text);
   line-height: 1.85;
   min-height: 100vh;
-  padding-bottom: 48px;
+  padding-bottom: calc(48px + env(safe-area-inset-bottom));
   overflow-x: hidden;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -93,6 +129,7 @@ body {
 .navbar {
   position: sticky;
   top: 0;
+  padding-top: env(safe-area-inset-top);
   z-index: 50;
   background: var(--nav-bg);
   border-bottom: 1px solid var(--border);
@@ -221,38 +258,43 @@ body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
-  padding-top: 6px;
+  gap: 4px;
+  padding-top: 8px;
   border-top: 1px solid var(--border);
 }
 
+/* منوی اصلی با طرح خط زیرین فیروزه‌ای — کاملاً متمایز از دکمه‌های عملیات */
 .nav-btn {
   font-family: inherit;
   font-size: 0.92rem;
   font-weight: 600;
-  padding: 8px 14px;
+  padding: 8px 15px 9px;
   min-height: 40px;
-  border-radius: 10px;
-  border: 1px solid transparent;
+  border-radius: 10px 10px 4px 4px;
+  border: none;
+  border-bottom: 3px solid transparent;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .nav-btn:hover {
-  background: var(--surface-hover);
+  background: var(--nav-active-bg);
   color: var(--text);
+  border-bottom-color: var(--border);
 }
 
 .nav-btn.active {
-  background: var(--badge-blue-bg);
-  color: var(--badge-blue-text);
+  background: var(--nav-active-bg);
+  color: var(--nav-accent);
+  border-bottom-color: var(--nav-accent);
+  font-weight: 700;
 }
 
 /* بدنه اصلی */
 .container {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -623,13 +665,43 @@ body {
   object-fit: cover;
 }
 
+.about-subheading {
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  color: var(--nav-accent);
+}
+
 .developer-info {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 10px;
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
   background: var(--surface-subtle);
   border: 1px solid var(--border);
-  font-size: 0.94rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.developer-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+
+.developer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.developer-info p {
+  margin-bottom: 0;
 }
 
 .developer-info a {
@@ -962,7 +1034,7 @@ code {
 /* پیام کوتاه */
 .toast {
   position: fixed;
-  bottom: 22px;
+  bottom: calc(22px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   background: var(--toast-bg);
@@ -1062,8 +1134,18 @@ code {
     font-size: 1rem;
     padding: 12px 14px;
     min-height: 48px;
+    border-radius: 10px;
     border: 1px solid var(--border);
+    border-right: 4px solid transparent;
     background: var(--surface);
+  }
+
+  .nav-btn.active {
+    border-color: var(--nav-accent);
+    border-right-width: 4px;
+    border-bottom-width: 1px;
+    background: var(--nav-active-bg);
+    color: var(--nav-accent);
   }
 
   .container {
@@ -1115,5 +1197,841 @@ code {
   .options-grid.cols-2,
   .options-grid.cols-3 {
     grid-template-columns: 1fr;
+  }
+}
+
+/* استایل بخش طراحی سؤال کارتی و بارگیری/پشتیبان‌گیری (نسخه ۲.۳) */
+.badge-custom {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border: 1px solid var(--warn-border);
+}
+
+.lesson-custom-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  margin-right: 6px;
+  background: var(--badge-teal-bg);
+  color: var(--badge-teal-text);
+  vertical-align: middle;
+}
+
+.mode-custom-note {
+  font-size: 0.82rem;
+  color: var(--badge-teal-text);
+  margin-bottom: 10px;
+}
+
+.empty-state-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 28px 18px;
+  background: var(--surface);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+}
+
+.empty-state-box p {
+  margin-bottom: 14px;
+}
+
+/* دو زیرمنوی دکمه‌ای بالای «طراحی سؤال» (رنگ بنفش متمایز از دکمه‌های آبی عملیات و منوی فیروزه‌ای بالا) */
+.builder-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+}
+
+.builder-tab {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  min-height: 46px;
+  border-radius: 999px;
+  border: 1.5px solid var(--submenu-soft-border);
+  background: var(--submenu-soft-bg);
+  color: var(--submenu-soft-text);
+  box-shadow: 0 0 0 3px var(--submenu-halo-soft);
+  opacity: 0.84;
+  cursor: pointer;
+  transition: background-color 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s, opacity 0.18s, transform 0.12s;
+}
+
+.builder-tab:hover:not(.active) {
+  opacity: 1;
+  border-color: var(--submenu-accent);
+  box-shadow: 0 0 0 4px var(--submenu-halo-soft), 0 3px 10px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.builder-tab.active {
+  opacity: 1;
+  background: linear-gradient(135deg, var(--submenu-accent), var(--submenu-accent-deep));
+  color: #ffffff;
+  border-color: var(--submenu-accent);
+  box-shadow: 0 4px 16px var(--submenu-halo-strong), 0 0 0 3px var(--submenu-ring);
+}
+
+.builder-total-pill {
+  margin-right: auto;
+}
+
+/* نوار مسیر قابل کلیک (Breadcrumb) */
+.breadcrumb-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.crumb-btn {
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--surface);
+  color: var(--badge-blue-text);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.crumb-btn:hover {
+  background: var(--badge-blue-bg);
+}
+
+.crumb-current {
+  font-weight: 700;
+  color: var(--text);
+  padding: 4px 6px;
+}
+
+.crumb-sep {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* شبکه کارت‌های درس و زیربخش در طراحی سؤال */
+.builder-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.builder-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 124px;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  text-align: right;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+}
+
+.builder-card:hover {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+}
+
+.builder-card-custom {
+  border-color: var(--warn-border);
+}
+
+.builder-card-add {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 2px dashed var(--primary);
+  background: var(--badge-blue-bg);
+  color: var(--badge-blue-text);
+  font-family: inherit;
+}
+
+.builder-card-add:hover {
+  background: var(--surface-hover);
+}
+
+.builder-card-add-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.builder-card-add-label {
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.builder-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.builder-card-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.builder-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-action-btn {
+  font-family: inherit;
+  font-size: 0.96rem;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.icon-action-btn:hover {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.icon-action-btn.danger:hover {
+  border-color: var(--red-border);
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.builder-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.builder-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+/* پنل درون‌خطی ساخت درس یا زیربخش */
+.inline-panel {
+  border-color: var(--primary);
+}
+
+.inline-panel-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.inline-panel-row .form-control {
+  flex: 1;
+  min-width: 220px;
+}
+
+.inline-panel-divider {
+  margin: 14px 0 8px;
+  font-size: 0.86rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.preset-chip-btn {
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.preset-chip-btn:hover {
+  border-color: var(--primary);
+  background: var(--badge-blue-bg);
+  color: var(--badge-blue-text);
+}
+
+.preset-chip-btn.added {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+/* نوار بالای مرحله ۴ (سؤال‌های زیربخش) */
+.builder-q-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.builder-q-heading {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.builder-q-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.builder-intro-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.builder-intro-head h2 {
+  font-size: 1.14rem;
+  margin-bottom: 4px;
+}
+
+.builder-card-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.form-control {
+  width: 100%;
+  font-family: inherit;
+  font-size: max(16px, 0.96rem);
+  padding: 10px 12px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--text);
+  line-height: 1.6;
+  transition: border-color 0.15s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 76px;
+}
+
+.input-correct {
+  border-color: var(--green);
+}
+
+.field-help {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.inline-create-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.builder-form-header,
+.builder-list-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.builder-form-header .builder-card-title,
+.builder-list-header .builder-card-title {
+  margin-bottom: 0;
+}
+
+.question-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wrong-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.form-submit-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.builder-questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.custom-q-item {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.custom-q-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.custom-q-prompt {
+  font-weight: 700;
+  font-size: 0.98rem;
+  flex: 1;
+}
+
+.custom-q-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mini-btn {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.mini-btn:hover {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+}
+
+.mini-btn-danger {
+  color: var(--red);
+  border-color: var(--red-border);
+}
+
+.mini-btn-danger:hover {
+  background: var(--red-bg);
+}
+
+.custom-q-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.opt-pill {
+  font-size: 0.84rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.opt-pill.opt-ok {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.custom-q-hint {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+/* بخش بارگیری و پشتیبان‌گیری — چیدمان روی هم در همه دستگاه‌ها */
+.backup-restore-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.backup-restore-grid > .card {
+  margin-bottom: 0;
+}
+
+/* کادر عنوان واضح و پس‌زمینه‌دار برای پشتیبان‌گیری و بازیابی */
+.panel-card-header {
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-right-width: 5px;
+}
+
+.panel-card-header h2 {
+  font-size: 1.06rem;
+  font-weight: 800;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.panel-card-header-backup {
+  background: var(--backup-head-bg);
+  border-color: var(--backup-head-border);
+  border-right-color: var(--backup-head-accent);
+}
+
+.panel-card-header-backup h2 {
+  color: var(--backup-head-accent);
+}
+
+.panel-card-header-restore {
+  background: var(--restore-head-bg);
+  border-color: var(--restore-head-border);
+  border-right-color: var(--restore-head-accent);
+}
+
+.panel-card-header-restore h2 {
+  color: var(--restore-head-accent);
+}
+
+/* نوار آمار محتوای شخصی با ۳ کارتک رنگی مجزا (بدون نقطه جداکننده کنار صفر) */
+.backup-stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+}
+
+.backup-stats-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-left: 4px;
+}
+
+.backup-stat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.stat-chip strong {
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.stat-chip-blue {
+  background: var(--badge-blue-bg);
+  color: var(--badge-blue-text);
+  border-color: rgba(59, 130, 246, 0.28);
+}
+
+.stat-chip-teal {
+  background: var(--badge-teal-bg);
+  color: var(--badge-teal-text);
+  border-color: rgba(20, 184, 166, 0.3);
+}
+
+.stat-chip-purple {
+  background: var(--submenu-soft-bg);
+  color: var(--submenu-soft-text);
+  border-color: var(--submenu-soft-border);
+}
+
+.backup-note {
+  font-size: 0.9rem;
+  margin-bottom: 14px;
+}
+
+.backup-scope-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.backup-lesson-picker {
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  border: 1px dashed var(--primary);
+}
+
+.selective-export-row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.backup-primary-action {
+  margin-bottom: 12px;
+}
+
+.restore-card > p {
+  font-size: 0.91rem;
+  margin-bottom: 14px;
+}
+
+.restore-picker-row {
+  margin-bottom: 14px;
+}
+
+.restore-preview-box {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  border: 1.5px solid var(--submenu-accent);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.restore-preview-head p {
+  margin-top: 4px;
+  font-size: 0.88rem;
+}
+
+.restore-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.restore-mode-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.restore-mode-option input[type="radio"] {
+  margin-top: 5px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+}
+
+.restore-mode-option.selected {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+}
+
+.restore-mode-option.selected-danger {
+  border-color: var(--red);
+  background: var(--red-bg);
+}
+
+.restore-mode-title {
+  font-weight: 700;
+  font-size: 0.96rem;
+  margin-bottom: 4px;
+}
+
+.restore-mode-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.replace-danger-box {
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--red-bg);
+  border: 1px solid var(--red-border);
+  color: var(--red);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.restore-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .backup-restore-grid {
+    grid-template-columns: 1fr;
+  }
+  .builder-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .backup-scope-grid,
+  .selective-export-row,
+  .restore-mode-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .builder-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .builder-total-pill {
+    margin-right: 0;
+    text-align: center;
+  }
+  .builder-cards-grid,
+  .wrong-options-grid {
+    grid-template-columns: 1fr;
+  }
+  .builder-q-toolbar-actions,
+  .builder-q-toolbar-actions .btn,
+  .form-submit-row .btn,
+  .restore-confirm-actions .btn,
+  .backup-primary-action .btn,
+  .restore-picker-row .btn,
+  .replace-danger-box .btn {
+    width: 100%;
+  }
+  .developer-avatar {
+    width: 62px;
+    height: 62px;
+  }
+}
+
+/* بهینه‌سازی لمسی اندروید و iOS (جلوگیری از زوم ناخواسته با ضربه سریع) */
+button,
+.builder-card,
+.grade-card-btn,
+.option-btn,
+.restore-mode-option,
+.preset-chip-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backup-primary-action,
+.restore-picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.paste-restore-box {
+  margin-bottom: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  border: 1px dashed var(--primary);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paste-restore-box label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .backup-primary-action .btn,
+  .restore-picker-row .btn,
+  .paste-restore-box .btn {
+    width: 100%;
   }
 }

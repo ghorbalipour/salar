@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="نرم‌افزار تعاملی املا و لغت فارسی دبستان (سالار)؛ تمرین رایگان و آفلاین املا، معنی لغات و صداشناسی فارسی اول تا ششم ابتدایی روی گوشی اندروید، آیفون و ویندوز.">
-  <meta name="keywords" content="نرم افزار املا دبستان, تمرین املا فارسی ابتدایی, معنی لغات فارسی دبستان, املا اول دبستان, املا دوم دبستان, املا سوم دبستان, املا چهارم دبستان, املا پنجم دبستان, املا ششم دبستان, بازی املا فارسی, اپلیکیشن املا آفلاین, نرم افزار سالار">
+  <meta name="description" content="نرم‌افزار تعاملی املا و لغت فارسی دبستان (سالار)؛ تمرین رایگان و آفلاین املا، معنی لغات و صداشناسی فارسی اول تا ششم ابتدایی همراه با ابزار طراحی سؤال شخصی برای معلمان و والدین.">
+  <meta name="keywords" content="نرم افزار املا دبستان, تمرین املا فارسی ابتدایی, معنی لغات فارسی دبستان, املا اول دبستان, املا دوم دبستان, املا سوم دبستان, املا چهارم دبستان, املا پنجم دبستان, املا ششم دبستان, بازی املا فارسی, اپلیکیشن املا آفلاین, طراحی آزمون املا, نرم افزار سالار">
   <meta name="author" content="مهدی قربعلی پوردرو">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="سالار">
 
   <link rel="canonical" href="https://ghorbalipour.github.io/salar/">
@@ -19,7 +19,7 @@
   <meta property="og:locale" content="fa_IR">
   <meta property="og:site_name" content="نرم‌افزار آموزشی سالار">
   <meta property="og:title" content="سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان (اول تا ششم)">
-  <meta property="og:description" content="تمرین هوشمند، رایگان و آفلاین املا و معنی لغات فارسی پایه‌های اول تا ششم دبستان؛ با مرور خودکار اشتباهات و قابل نصب روی گوشی و کامپیوتر.">
+  <meta property="og:description" content="تمرین هوشمند، رایگان و آفلاین املا و معنی لغات فارسی پایه‌های اول تا ششم دبستان؛ با مرور خودکار اشتباهات و امکان طراحی و اشتراک‌گذاری سؤال توسط معلمان و والدین.">
   <meta property="og:url" content="https://ghorbalipour.github.io/salar/">
   <meta property="og:image" content="https://ghorbalipour.github.io/salar/images/icon-512.png">
   <meta property="og:image:width" content="512">
@@ -27,14 +27,14 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان">
-  <meta name="twitter:description" content="تمرین رایگان و آفلاین املا و معنی لغات فارسی اول تا ششم ابتدایی.">
+  <meta name="twitter:description" content="تمرین رایگان و آفلاین املا و معنی لغات فارسی اول تا ششم ابتدایی همراه با بخش طراحی سؤال شخصی.">
   <meta name="twitter:image" content="https://ghorbalipour.github.io/salar/images/icon-512.png">
 
   <title>سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان (اول تا ششم)</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="images/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css?v=2.1">
+  <link rel="stylesheet" href="style.css?v=2.7">
 
   <!-- داده‌های ساختاریافته (Schema.org) برای نمایش بهتر در نتایج گوگل -->
   <script type="application/ld+json">
@@ -43,7 +43,7 @@
     "@type": "WebApplication",
     "name": "سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان",
     "alternateName": "نرم‌افزار آموزشی سالار",
-    "description": "نرم‌افزار تعاملی، رایگان و آفلاین برای تمرین املا، صداشناسی و معنی لغات کتاب فارسی پایه‌های اول تا ششم ابتدایی با قابلیت مرور هوشمند اشتباهات.",
+    "description": "نرم‌افزار تعاملی، رایگان و آفلاین برای تمرین املا، صداشناسی و معنی لغات کتاب فارسی پایه‌های اول تا ششم ابتدایی با قابلیت مرور هوشمند اشتباهات و طراحی سؤال شخصی.",
     "applicationCategory": "EducationalApplication",
     "educationalLevel": "Primary School (Grades 1 to 6)",
     "inLanguage": "fa",
@@ -95,6 +95,7 @@
       <!-- لینک‌های ناوبری -->
       <div id="nav-links" class="nav-links">
         <button class="nav-btn active" data-nav="grades" type="button">مقاطع تحصیلی</button>
+        <button class="nav-btn" data-nav="builder" type="button">طراحی سؤال</button>
         <button class="nav-btn" data-nav="install" type="button">نصب آفلاین</button>
         <button class="nav-btn" data-nav="about" type="button">درباره</button>
         <button class="nav-btn" data-nav="naming" type="button">نام‌گذاری نرم‌افزار</button>
@@ -133,6 +134,7 @@
           نرم‌افزار آموزشی <strong>سالار</strong> تمامی درس‌های کتاب فارسی دوره‌ی ابتدایی (پایه اول تا ششم) را به صورت
           <strong>درس‌به‌درس</strong> و <strong>آزمون جامع</strong> پوشش می‌دهد. دانش‌آموز می‌تواند به شکل رایگان و بدون نیاز به اینترنت،
           املای واژگان دشوار، صداشناسی کلاس اول و معنی لغات و کنایه‌های فارسی را تمرین کند و پاسخ‌های نادرست خود را دوباره مرور نماید.
+          همچنین والدین و معلمان می‌توانند از بخش <strong>«طراحی سؤال»</strong>، سؤال، بخش (مثل هم‌خانواده، متضاد و هم‌معنی) یا درس دلخواه بسازند و با دانش‌آموزان به اشتراک بگذارند.
         </p>
       </section>
     </main>
@@ -147,45 +149,9 @@
       </footer>
     </main>
 
-    <!-- ۳. صفحه داخلی هر درس (یا همه درس‌های یک پایه) -->
+    <!-- ۳. صفحه داخلی هر درس (یا همه درس‌های یک پایه — کارت‌های بخش‌ها به صورت پویا ساخته می‌شوند) -->
     <main id="lesson-view" class="hidden">
-      <section class="modes-grid">
-        <div class="card mode-card">
-          <div class="mode-header">
-            <h2 id="spelling-mode-title">بخش املا</h2>
-            <span class="badge badge-blue">تشخیص نوشتار درست</span>
-          </div>
-          <div class="stats-row">
-            <div>کل سؤالات: <strong id="stat-sp-total">0</strong></div>
-            <div>بلد بوده: <strong id="stat-sp-ok" class="text-green">0</strong></div>
-            <div>نیاز به مرور: <strong id="stat-sp-wrong" class="text-red">0</strong></div>
-          </div>
-          <div class="mode-actions">
-            <button id="btn-start-spelling" class="btn btn-primary btn-block" type="button">شروع تمرین املا</button>
-            <button id="btn-review-spelling" class="btn btn-danger-outline btn-block hidden" type="button">
-              مرور اشتباهات املا (<span id="cnt-sp-wrong">0</span>)
-            </button>
-          </div>
-        </div>
-
-        <div class="card mode-card">
-          <div class="mode-header">
-            <h2 id="meaning-mode-title">بخش معنی لغات</h2>
-            <span id="meaning-mode-badge" class="badge badge-teal">یادگیری معنای واژه‌ها</span>
-          </div>
-          <div class="stats-row">
-            <div>کل سؤالات: <strong id="stat-mn-total">0</strong></div>
-            <div>بلد بوده: <strong id="stat-mn-ok" class="text-green">0</strong></div>
-            <div>نیاز به مرور: <strong id="stat-mn-wrong" class="text-red">0</strong></div>
-          </div>
-          <div class="mode-actions">
-            <button id="btn-start-meaning" class="btn btn-primary btn-block" type="button">شروع تمرین معنی</button>
-            <button id="btn-review-meaning" class="btn btn-danger-outline btn-block hidden" type="button">
-              مرور اشتباهات معنی (<span id="cnt-mn-wrong">0</span>)
-            </button>
-          </div>
-        </div>
-      </section>
+      <section id="modes-grid" class="modes-grid"></section>
 
       <footer class="page-bottom-bar">
         <button class="btn btn-outline btn-sm js-go-grade-home" type="button">بازگشت به فهرست درس‌ها</button>
@@ -254,7 +220,280 @@
       </footer>
     </main>
 
-    <!-- ۶. صفحه «نحوه نصب آفلاین و به‌روزرسانی» -->
+    <!-- ۶. صفحه «طراحی سؤال» (رابط کارتی مرحله‌به‌مرحله + تب بارگیری و پشتیبان‌گیری) -->
+    <main id="builder-view" class="hidden">
+      <!-- نوار دو زبانه بالای طراحی سؤال -->
+      <div class="builder-tabs" role="tablist" aria-label="بخش‌های طراحی سؤال">
+        <button id="tab-builder-manage" class="builder-tab active" data-builder-tab="manage" type="button" role="tab" aria-selected="true">
+          ✏️ مدیریت سؤال‌ها
+        </button>
+        <button id="tab-builder-backup" class="builder-tab" data-builder-tab="backup" type="button" role="tab" aria-selected="false">
+          💾 بارگیری و پشتیبان‌گیری
+        </button>
+        <span id="builder-total-badge" class="badge badge-teal builder-total-pill">۰ سؤال شخصی</span>
+      </div>
+
+      <!-- تب ۱: مدیریت کارتی و مرحله‌به‌مرحله سؤال‌ها -->
+      <div id="builder-manage-panel">
+        <!-- نوار مسیر قابل کلیک (Breadcrumb) -->
+        <nav id="builder-breadcrumb" class="breadcrumb-bar" aria-label="مسیر فعلی"></nav>
+
+        <!-- مرحله ۱: انتخاب پایه (۶ کارت) -->
+        <section id="builder-step-grades">
+          <p class="section-subtitle">پایه تحصیلی مورد نظر را انتخاب کنید تا درس‌های آن نمایش داده شود:</p>
+          <div id="builder-grades-grid" class="grades-grid"></div>
+        </section>
+
+        <!-- مرحله ۲: انتخاب یا ساخت درس -->
+        <section id="builder-step-lessons" class="hidden">
+          <p class="section-subtitle">روی هر درس کلیک کنید تا زیربخش‌های آن باز شود، یا درس جدید بسازید:</p>
+
+          <!-- فرم درون‌خطی ساخت یا تغییر نام درس -->
+          <div id="inline-lesson-box" class="card inline-panel hidden">
+            <h3 id="inline-lesson-heading" class="builder-card-title">➕ افزودن درس جدید</h3>
+            <div class="inline-panel-row">
+              <input id="input-lesson-title" class="form-control" type="text" maxlength="90" placeholder="مثلاً: درس آزاد (آذرماه) یا مرور نوبت اول">
+              <div class="inline-create-actions">
+                <button id="btn-save-lesson" class="btn btn-primary btn-sm" type="button">ذخیره درس</button>
+                <button id="btn-cancel-lesson" class="btn btn-ghost btn-sm" type="button">انصراف</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="builder-lessons-grid" class="builder-cards-grid"></div>
+        </section>
+
+        <!-- مرحله ۳: انتخاب یا ساخت زیربخش -->
+        <section id="builder-step-sections" class="hidden">
+          <p class="section-subtitle">روی هر زیربخش کلیک کنید تا سؤال‌های آن را ببینید، اضافه یا ویرایش کنید:</p>
+
+          <!-- پنل درون‌خطی افزودن زیربخش پیشنهادی یا دلخواه / تغییر نام -->
+          <div id="inline-section-box" class="card inline-panel hidden">
+            <h3 id="inline-section-heading" class="builder-card-title">➕ افزودن زیربخش جدید</h3>
+            <div id="preset-sections-wrap" class="preset-sections-wrap">
+              <p class="field-help">انتخاب سریع از زیربخش‌های پیشنهادی فارسی (با یک کلیک):</p>
+              <div id="preset-sections-chips" class="preset-chips"></div>
+            </div>
+            <div class="inline-panel-divider" id="inline-section-divider">یا نام زیربخش دلخواه بنویسید:</div>
+            <div class="inline-panel-row">
+              <input id="input-section-title" class="form-control" type="text" maxlength="50" placeholder="مثلاً: جمله‌سازی، نشانه‌های نگارشی یا ترکیب‌ها">
+              <div class="inline-create-actions">
+                <button id="btn-save-section" class="btn btn-primary btn-sm" type="button">افزودن زیربخش</button>
+                <button id="btn-cancel-section" class="btn btn-ghost btn-sm" type="button">انصراف</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="builder-sections-grid" class="builder-cards-grid"></div>
+        </section>
+
+        <!-- مرحله ۴: مدیریت سؤال‌های زیربخش انتخاب‌شده -->
+        <section id="builder-step-questions" class="hidden">
+          <!-- نوار خلاصه و دکمه‌های اصلی زیربخش -->
+          <div class="card builder-q-toolbar">
+            <div>
+              <h2 id="builder-q-heading" class="builder-q-heading">بخش املا</h2>
+              <p id="builder-context-summary" class="text-muted"></p>
+            </div>
+            <div class="builder-q-toolbar-actions">
+              <button id="btn-toggle-q-form" class="btn btn-primary btn-sm" type="button">➕ افزودن سؤال جدید</button>
+              <button id="btn-builder-try-quiz" class="btn btn-outline btn-sm" type="button">▶️ تمرین همین بخش</button>
+              <button id="btn-quick-export-lesson" class="btn btn-outline btn-sm" type="button">⬇️ خروجی این درس</button>
+            </div>
+          </div>
+
+          <!-- فرم افزودن یا ویرایش سؤال -->
+          <section id="builder-form-card" class="card builder-form-card hidden">
+            <div class="builder-form-header">
+              <h3 id="builder-form-title" class="builder-card-title">افزودن سؤال جدید</h3>
+              <button id="btn-cancel-edit" class="btn btn-ghost btn-sm" type="button">بستن فرم</button>
+            </div>
+
+            <form id="question-form" class="question-form" novalidate>
+              <div class="form-field">
+                <label for="q-prompt">صورت سؤال <span class="text-red">*</span></label>
+                <textarea id="q-prompt" class="form-control" rows="2" maxlength="320" placeholder="مثلاً: متضاد کلمه‌ی «آغاز» چیست؟  یا  املای درست کدام کلمه است؟" required></textarea>
+              </div>
+
+              <div class="form-field">
+                <label for="q-correct" class="text-green">پاسخ درست <span class="text-red">*</span></label>
+                <input id="q-correct" class="form-control input-correct" type="text" maxlength="160" placeholder="پاسخ صحیح را اینجا بنویسید..." required>
+                <small class="field-help">پاسخ درست را همیشه در همین کادر بنویسید؛ هنگام آزمون جای گزینه‌ها خودکار بُر می‌خورد.</small>
+              </div>
+
+              <div class="wrong-options-grid">
+                <div class="form-field">
+                  <label for="q-wrong-1">گزینه نادرست ۱ <span class="text-red">*</span></label>
+                  <input id="q-wrong-1" class="form-control" type="text" maxlength="160" placeholder="گزینه انحرافی اول (الزامی)" required>
+                </div>
+                <div class="form-field">
+                  <label for="q-wrong-2">گزینه نادرست ۲ (اختیاری)</label>
+                  <input id="q-wrong-2" class="form-control" type="text" maxlength="160" placeholder="گزینه انحرافی دوم">
+                </div>
+                <div class="form-field">
+                  <label for="q-wrong-3">گزینه نادرست ۳ (اختیاری)</label>
+                  <input id="q-wrong-3" class="form-control" type="text" maxlength="160" placeholder="گزینه انحرافی سوم">
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="q-hint">نکته آموزشی (اختیاری — هنگام پاسخ نادرست نمایش داده می‌شود)</label>
+                <input id="q-hint" class="form-control" type="text" maxlength="240" placeholder="مثلاً: «آغاز» به معنی شروع و متضاد آن «پایان» است.">
+              </div>
+
+              <div class="form-submit-row">
+                <button id="btn-submit-question" class="btn btn-primary" type="submit">ذخیره سؤال</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- فهرست سؤال‌های شخصی همین زیربخش -->
+          <section class="card">
+            <div class="builder-list-header">
+              <h3 id="builder-list-title" class="builder-card-title">سؤال‌های شخصی ثبت‌شده در این زیربخش</h3>
+              <span id="builder-list-count" class="badge badge-blue">۰ سؤال</span>
+            </div>
+            <div id="builder-questions-list" class="builder-questions-list"></div>
+          </section>
+        </section>
+      </div>
+
+      <!-- تب ۲: بارگیری و پشتیبان‌گیری (روی هم در همه دستگاه‌ها) -->
+      <div id="builder-backup-panel" class="hidden">
+        <div class="backup-restore-grid">
+          <!-- کارت ۱: پشتیبان‌گیری یکپارچه (Backup — طرح الف) -->
+          <section class="card backup-card">
+            <div class="panel-card-header panel-card-header-backup">
+              <h2>📦 پشتیبان‌گیری از سؤال‌های شخصی (Backup)</h2>
+            </div>
+
+            <!-- نمایش آمار در ۳ کارتک رنگی مجزا و بدون نقطه جداکننده -->
+            <div class="backup-stats-bar" aria-label="آمار محتوای شخصی روی این دستگاه">
+              <span class="backup-stats-label">وضعیت فعلی روی این دستگاه:</span>
+              <div class="backup-stat-chips">
+                <span class="stat-chip stat-chip-blue">سؤال شخصی: <strong id="stat-backup-questions">۰</strong></span>
+                <span class="stat-chip stat-chip-teal">درس شخصی: <strong id="stat-backup-lessons">۰</strong></span>
+                <span class="stat-chip stat-chip-purple">زیربخش دلخواه: <strong id="stat-backup-sections">۰</strong></span>
+              </div>
+            </div>
+
+            <div id="backup-reminder-box" class="update-status-box warn hidden" role="status" aria-live="polite"></div>
+
+            <p class="backup-note text-muted">
+              سؤال‌های شخصی شما در حافظه‌ی مرورگر ذخیره می‌شوند و در آپدیت‌های بعدی سالار حفظ می‌گردند. محدوده‌ی پشتیبان‌گیری را انتخاب کرده و فایل (JSON) را دانلود، به اشتراک گذاشته یا متن آن را کپی کنید.
+            </p>
+
+            <!-- انتخاب محدوده پشتیبان‌گیری: کل سؤالات یا فقط یک درس خاص -->
+            <div class="backup-scope-grid" role="radiogroup" aria-label="انتخاب محدوده پشتیبان‌گیری">
+              <label class="restore-mode-option selected" id="lbl-backup-scope-all">
+                <input type="radio" name="backup-scope" value="all" checked>
+                <div>
+                  <div class="restore-mode-title">📦 همه‌ی سؤال‌های شخصی (پشتیبان کامل)</div>
+                  <p class="restore-mode-desc">شامل تمام درس‌ها، زیربخش‌ها و سؤال‌های شخصی در هر ۶ پایه.</p>
+                </div>
+              </label>
+
+              <label class="restore-mode-option" id="lbl-backup-scope-lesson">
+                <input type="radio" name="backup-scope" value="lesson">
+                <div>
+                  <div class="restore-mode-title">📤 فقط یک درس خاص</div>
+                  <p class="restore-mode-desc">مناسب اشتراک‌گذاری سؤال‌های یک درس در شاد، ایتا، بله و تلگرام.</p>
+                </div>
+              </label>
+            </div>
+
+            <!-- انتخاب پایه و درس (فقط در حالت «فقط یک درس خاص») -->
+            <div id="backup-lesson-picker" class="backup-lesson-picker hidden">
+              <div class="selective-export-row">
+                <select id="backup-grade-select" class="form-control" aria-label="انتخاب پایه برای خروجی"></select>
+                <select id="backup-lesson-select" class="form-control" aria-label="انتخاب درس برای خروجی"></select>
+              </div>
+            </div>
+
+            <!-- یک ردیف مشترک و شفاف از دکمه‌های خروجی -->
+            <div class="backup-primary-action">
+              <button id="btn-export-download" class="btn btn-primary" type="button">⬇️ دانلود فایل پشتیبان</button>
+              <button id="btn-export-share" class="btn btn-outline hidden" type="button">📤 اشتراک‌گذاری فایل</button>
+              <button id="btn-export-copy" class="btn btn-outline" type="button">📋 کپی متن پشتیبان</button>
+            </div>
+
+            <div id="backup-status-box" class="update-status-box hidden" role="status" aria-live="polite"></div>
+          </section>
+
+          <!-- کارت ۲: بارگیری و بازیابی (Restore با پیش‌نمایش + Merge / Replace) -->
+          <section class="card restore-card">
+            <div class="panel-card-header panel-card-header-restore">
+              <h2>⬆️ بارگیری و بازیابی از فایل پشتیبان (Restore)</h2>
+            </div>
+
+            <p class="text-muted">
+              فایل پشتیبان (JSON) را انتخاب کنید. پیش از اعمال هر تغییری، خلاصه‌ی محتوای فایل به شما نمایش داده می‌شود تا بین <strong>ادغام (Merge)</strong> و <strong>جایگزینی کامل (Replace)</strong> انتخاب کنید.
+            </p>
+
+            <div class="restore-picker-row">
+              <button id="btn-import-trigger" class="btn btn-primary" type="button">📂 انتخاب فایل پشتیبان (.json)</button>
+              <button id="btn-toggle-paste-restore" class="btn btn-outline" type="button">📋 بازیابی از متن کپی‌شده</button>
+              <input id="input-import-file" class="hidden" type="file" accept=".json,application/json,text/plain,*/*">
+            </div>
+
+            <!-- روش جایگزین برای پیام‌رسان‌ها و گوشی‌هایی که پسوند فایل را تغییر می‌دهند -->
+            <div id="paste-restore-box" class="paste-restore-box hidden">
+              <label for="input-paste-json">متن پشتیبان (JSON) را اینجا جای‌گذاری (Paste) کنید:</label>
+              <textarea id="input-paste-json" class="form-control" rows="4" dir="ltr" placeholder="{ &quot;app&quot;: &quot;salar&quot;, ... }"></textarea>
+              <div class="inline-create-actions">
+                <button id="btn-parse-pasted-json" class="btn btn-primary btn-sm" type="button">🔍 بررسی و پیش‌نمایش</button>
+                <button id="btn-cancel-paste-restore" class="btn btn-ghost btn-sm" type="button">بستن</button>
+              </div>
+            </div>
+
+            <div id="import-status-box" class="update-status-box hidden" role="status" aria-live="polite"></div>
+
+            <!-- جعبه پیش‌نمایش و انتخاب حالت Merge یا Replace -->
+            <div id="restore-preview-box" class="restore-preview-box hidden">
+              <div class="restore-preview-head">
+                <strong>📄 پیش‌نمایش فایل انتخاب‌شده: <span id="restore-file-name"></span></strong>
+                <p id="restore-file-summary" class="text-muted"></p>
+              </div>
+
+              <div class="restore-mode-grid" role="radiogroup" aria-label="روش بارگیری فایل پشتیبان">
+                <label class="restore-mode-option selected" id="lbl-mode-merge">
+                  <input type="radio" name="restore-mode" value="merge" checked>
+                  <div>
+                    <div class="restore-mode-title">🟢 ادغام هوشمند (Merge) <span class="badge badge-teal">پیشنهادی و ایمن</span></div>
+                    <p class="restore-mode-desc">درس‌ها، زیربخش‌ها و سؤال‌های جدید به محتوای شخصی فعلی شما اضافه می‌شوند؛ سؤال‌های قبلی حفظ شده و از تکرار جلوگیری می‌شود.</p>
+                  </div>
+                </label>
+
+                <label class="restore-mode-option" id="lbl-mode-replace">
+                  <input type="radio" name="restore-mode" value="replace">
+                  <div>
+                    <div class="restore-mode-title">🔴 جایگزینی کامل (Replace)</div>
+                    <p class="restore-mode-desc">تمام درس‌ها، زیربخش‌ها و سؤال‌های شخصی فعلی شما پاک شده و دقیقاً با محتوای این فایل پشتیبان جایگزین می‌شوند (محتوای رسمی کتاب‌ها تغییر نمی‌کند).</p>
+                  </div>
+                </label>
+              </div>
+
+              <!-- سپر حفاظتی برای حالت Replace -->
+              <div id="replace-danger-box" class="replace-danger-box hidden">
+                <p id="replace-danger-text"></p>
+                <button id="btn-backup-before-replace" class="btn btn-outline btn-sm" type="button">💾 ابتدا از سؤالات فعلی پشتیبان بگیر</button>
+              </div>
+
+              <div class="restore-confirm-actions">
+                <button id="btn-confirm-restore" class="btn btn-primary" type="button">✅ اجرای ادغام هوشمند</button>
+                <button id="btn-cancel-restore" class="btn btn-ghost" type="button">انصراف</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-grades" type="button">بازگشت به مقاطع تحصیلی</button>
+      </footer>
+    </main>
+
+    <!-- ۷. صفحه «نحوه نصب آفلاین و به‌روزرسانی» -->
     <main id="install-view" class="hidden">
       <!-- کارت نصب مستقیم (در کروم و اج اندروید و ویندوز فعال می‌شود) -->
       <section id="direct-install-card" class="card install-hero-card hidden">
@@ -311,7 +550,7 @@
         <div class="update-header">
           <div>
             <h2>🔄 نحوه دریافت نسخه‌ی جدیدتر (به‌روزرسانی)</h2>
-            <p class="text-muted">نسخه‌ی فعلی نصب‌شده روی دستگاه شما: <strong id="app-version-label">۲.۱</strong></p>
+            <p class="text-muted">نسخه‌ی فعلی نصب‌شده روی دستگاه شما: <strong id="app-version-label">۲.۷</strong></p>
           </div>
           <button id="btn-check-update" class="btn btn-primary" type="button">بررسی و دریافت نسخه جدید</button>
         </div>
@@ -319,7 +558,7 @@
         <ul class="info-list">
           <li><strong>به‌روزرسانی خودکار:</strong> هر زمان اینترنت دستگاه شما وصل باشد و نرم‌افزار سالار را باز کنید، برنامه به صورت خودکار فایل‌های جدیدتر را در پس‌زمینه دریافت می‌کند و در اجرای بعدی نسخه‌ی تازه نمایش داده می‌شود.</li>
           <li><strong>به‌روزرسانی دستی و فوری:</strong> در حالی که به اینترنت متصل هستید، کافی است روی دکمه‌ی <strong>«بررسی و دریافت نسخه جدید»</strong> در بالا بزنید (یا در ویندوز کلیدهای <code>Ctrl + F5</code> را فشار دهید).</li>
-          <li><strong>حفظ کامل پیشرفت دانش‌آموز:</strong> نگران پاک شدن امتیازها و اشتباهات ثبت‌شده نباشید؛ با به‌روزرسانی نرم‌افزار، پیشرفت‌های ذخیره‌شده‌ی دانش‌آموز کاملاً حفظ می‌شود.</li>
+          <li><strong>حفظ کامل پیشرفت و سؤال‌های شخصی:</strong> نگران پاک شدن امتیازها، اشتباهات ثبت‌شده یا سؤال‌هایی که خودتان طراحی کرده‌اید نباشید؛ با به‌روزرسانی نرم‌افزار همه‌ی داده‌های شما کاملاً حفظ می‌شوند.</li>
         </ul>
       </section>
 
@@ -328,30 +567,52 @@
       </footer>
     </main>
 
-    <!-- ۷. صفحه «درباره نرم‌افزار» -->
+    <!-- ۸. صفحه «درباره نرم‌افزار» -->
     <main id="about-view" class="hidden">
       <section class="card info-card">
         <h2>درباره نرم‌افزار آموزشی «سالار»</h2>
         <p>
-          نرم‌افزار «سالار» یک برنامه آموزشی ساده، رایگان و قابل اجرا روی گوشی، تبلت و کامپیوتر است که برای کمک به
-          دانش‌آموزان دوره ابتدایی (پایه‌های اول تا ششم) در یادگیری <strong>املای درست کلمات</strong>،
-          <strong>صداشناسی</strong> و <strong>معنی لغات و اصطلاحات</strong> کتاب فارسی طراحی شده است.
+          نرم‌افزار آموزشی <strong>«سالار»</strong> یک ابزار تعاملی، رایگان و بدون تبلیغات برای دانش‌آموزان، والدین و آموزگاران
+          دوره‌ی ابتدایی (پایه‌های اول تا ششم) است. این برنامه به گونه‌ای طراحی شده که یادگیری <strong>املای درست واژگان</strong>،
+          <strong>صداشناسی</strong> و <strong>معنی لغات و اصطلاحات کتاب فارسی</strong> را به تجربه‌ای ساده، هدفمند و ماندگار روی
+          گوشی، تبلت و کامپیوتر تبدیل کند.
         </p>
+
+        <h3 class="about-subheading">📚 امکانات آموزشی برای دانش‌آموزان</h3>
         <ul class="info-list">
-          <li>پوشش کامل و درس‌به‌درس کتاب‌های فارسی اول تا ششم دبستان به همراه آزمون جامع هر پایه.</li>
-          <li>جداسازی کامل بخش املا از بخش معنی لغات (و بخش صداشناسی و درک مطلب برای کلاس اول).</li>
-          <li>رعایت دقیق دایره‌ی حروف تدریس‌شده تا هر درس در پایه‌ی اول ابتدایی.</li>
-          <li>ثبت خودکار پاسخ‌های نادرست برای مرور هدفمند اشتباهات.</li>
-          <li>امکان تغییر اندازه نوشته‌ها (بزرگ‌نمایی و کوچک‌نمایی)، نمایش تمام‌نما و تغییر تم روشن و تیره.</li>
-          <li>ذخیره لحظه‌ای پیشرفت در دستگاه و قابلیت نصب و استفاده کاملاً آفلاین.</li>
+          <li><strong>پوشش کامل ۶ پایه ابتدایی:</strong> تمرین درس‌به‌درس و آزمون جامع از تمامی درس‌های کتاب فارسی اول تا ششم دبستان.</li>
+          <li><strong>تفکیک دقیق مهارت‌ها:</strong> جداسازی بخش «املا» از بخش «معنی لغات»؛ و در پایه‌ی اول، بخش «صداشناسی و معنا» همراه با رعایت کامل دایره‌ی حروف تدریس‌شده تا هر درس.</li>
+          <li><strong>مرور هوشمند اشتباهات:</strong> ثبت خودکار پاسخ‌های نادرست تا دانش‌آموز در مرور بعدی فقط روی واژگان دشوار خود تمرکز کند.</li>
+          <li><strong>ذخیره‌ی لحظه‌ای و ادامه‌ی آزمون:</strong> حفظ خودکار پیشرفت در دستگاه و امکان ادامه‌ی آزمون‌های نیمه‌کاره از همان نقطه.</li>
         </ul>
-        <p class="developer-info">
-          این نرم‌افزار توسط <strong>مهدی قربعلی پوردرو</strong> طراحی و ساخته شده است.<br>
-          پروفایل گیت‌هاب:
-          <a href="https://github.com/ghorbalipour/" target="_blank" rel="noopener noreferrer" dir="ltr">
-            github.com/ghorbalipour
-          </a>
-        </p>
+
+        <h3 class="about-subheading">✏️ ابزار «طراحی سؤال» ویژه معلمان و والدین</h3>
+        <ul class="info-list">
+          <li><strong>سفارشی‌سازی کامل در هر پایه:</strong> امکان افزودن سؤال جدید به بخش‌های رسمی هر درس، ساخت <strong>درس دلخواه</strong> (مانند «درس آزاد» یا «مرور نوبت اول») و ایجاد <strong>زیربخش‌های تازه</strong> از جمله <em>هم‌خانواده، متضاد، هم‌معنی، کلمات هم‌آوا، دانش زبانی، درک مطلب، ضرب‌المثل</em> یا هر عنوان دلخواه دیگر.</li>
+          <li><strong>معماری دولایه و ایمن در برابر آپدیت‌ها:</strong> تمامی سؤال‌ها، زیربخش‌ها و درس‌های شخصی جدا از فایل‌های رسمی نگهداری می‌شوند و با دریافت نسخه‌های جدید نرم‌افزار، هرگز حذف نمی‌شوند.</li>
+          <li><strong>بارگیری و پشتیبان‌گیری (Backup &amp; Restore):</strong> امکان تهیه‌ی فایل پشتیبان از کل سؤال‌های شخصی یا خروجی انتخابی از یک درس جهت اشتراک‌گذاری میان معلم و دانش‌آموزان (در شاد، ایتا، بله و تلگرام) همراه با پیش‌نمایش و انتخاب بین دو حالت <strong>ادغام هوشمند (Merge)</strong> و <strong>جایگزینی کامل (Replace)</strong>.</li>
+        </ul>
+
+        <h3 class="about-subheading">⚙️ تجربه‌ی کاربری، دسترس‌پذیری و اجرای آفلاین</h3>
+        <ul class="info-list">
+          <li><strong>نصب و اجرای کاملاً آفلاین (PWA):</strong> قابل نصب روی اندروید، آیفون و آیپد (iOS) و ویندوز بدون نیاز به اینترنت پس از نصب.</li>
+          <li><strong>راحتی در مطالعه:</strong> امکان بزرگ‌نمایی و کوچک‌نمایی متن‌ها، نمایش تمام‌نما (Fullscreen) و تغییر بین تم تیره و روشن.</li>
+        </ul>
+
+        <div class="developer-info">
+          <img src="images/grb-192.png" alt="تصویر مهدی قربعلی پوردرو" class="developer-avatar">
+          <div class="developer-meta">
+            <p class="developer-text">
+              این نرم‌افزار توسط <strong>مهدی قربعلی پوردرو</strong> طراحی و ساخته شده است.
+            </p>
+            <p class="developer-link-row">
+              پروفایل گیت‌هاب:
+              <a href="https://github.com/ghorbalipour/" target="_blank" rel="noopener noreferrer" dir="ltr">
+                github.com/ghorbalipour
+              </a>
+            </p>
+          </div>
+        </div>
       </section>
 
       <footer class="page-bottom-bar">
@@ -359,7 +620,7 @@
       </footer>
     </main>
 
-    <!-- ۸. صفحه «نام‌گذاری نرم‌افزار» (با کادر اختصاصی عکس) -->
+    <!-- ۹. صفحه «نام‌گذاری نرم‌افزار» (با کادر اختصاصی عکس) -->
     <main id="naming-view" class="hidden">
       <section class="card naming-card">
         <div class="naming-photo-wrap">
@@ -411,7 +672,7 @@
   <!-- پیام اطلاع‌رسانی کوتاه -->
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=2.1"></script>
+  <script src="app.js?v=2.7"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

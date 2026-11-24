@@ -1,19 +1,20 @@
-const CACHE_NAME = "salar-pwa-v11";
+const CACHE_NAME = "salar-pwa-v17";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./style.css?v=2.1",
-  "./app.js?v=2.1",
+  "./style.css?v=2.7",
+  "./app.js?v=2.7",
   "./manifest.json",
   "./images/icon-192.png",
   "./images/icon-512.png",
   "./images/naming.jpg",
-  "./data/grade1.js",
-  "./data/grade2.js",
-  "./data/grade3.js",
-  "./data/grade4.js",
-  "./data/grade5.js",
-  "./data/grade6.js"
+  "./images/grb-192.png",
+  "./data/grade1.js?v=2.7",
+  "./data/grade2.js?v=2.7",
+  "./data/grade3.js?v=2.7",
+  "./data/grade4.js?v=2.7",
+  "./data/grade5.js?v=2.7",
+  "./data/grade6.js?v=2.7"
 ];
 
 self.addEventListener("install", (event) => {
@@ -64,6 +65,8 @@ self.addEventListener("fetch", (event) => {
         }
         return networkResponse;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() =>
+        caches.match(event.request).then((hit) => hit || caches.match(event.request, { ignoreSearch: true }))
+      )
   );
 });
