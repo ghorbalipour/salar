@@ -238,15 +238,20 @@ body {
   transition: background-color 0.15s, border-color 0.15s;
 }
 
-.tool-btn:hover {
+.tool-btn:hover:not(:disabled) {
   background: var(--surface-hover);
   border-color: var(--primary);
 }
 
+.tool-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
 .tool-btn-pct {
-  min-width: 48px;
+  min-width: 52px;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: clamp(12px, 0.8rem, 16px);
 }
 
 .mobile-menu-btn {
@@ -2033,5 +2038,49 @@ button,
   .restore-picker-row .btn,
   .paste-restore-box .btn {
     width: 100%;
+  }
+}
+
+/* حفظ خوانایی و جلوگیری از به‌هم‌ریختگی نوار بالا و متون در زوم ۱۵۰٪ تا ۲۰۰٪ */
+.brand-name {
+  font-size: clamp(19px, 1.3rem, 26px);
+}
+
+.brand-tagline {
+  font-size: clamp(11px, 0.76rem, 15px);
+}
+
+.tool-btn {
+  font-size: clamp(13px, 0.84rem, 17px);
+}
+
+.question-prompt,
+.option-btn,
+.lesson-main-btn,
+.builder-card-name,
+.custom-q-prompt,
+.grade-title {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (max-width: 680px) {
+  .brand-name {
+    font-size: clamp(18px, 1.2rem, 23px);
+  }
+
+  .brand-tagline {
+    font-size: clamp(11px, 0.74rem, 14px);
+  }
+
+  .tool-btn {
+    min-height: 40px;
+    padding: 6px 10px;
+    font-size: clamp(13px, 0.84rem, 16px);
+  }
+
+  .tool-btn-pct {
+    min-width: 48px;
+    font-size: clamp(12px, 0.78rem, 15px);
   }
 }

@@ -2,18 +2,20 @@
   "use strict";
 
   // کلیدهای ذخیره‌سازی محلی (کاملاً مستقل از کش فایل‌های نرم‌افزار — در آپدیت‌ها حفظ می‌شوند)
-  const APP_VERSION = "2.7";
+  const APP_VERSION = "2.8";
   const BACKUP_META_KEY = "salar_backup_meta_v1";
   const STORAGE_KEY = "farsi6_emla_app_v1";
   const CUSTOM_STORAGE_KEY = "salar_custom_content_v1";
   const THEME_KEY = "salar_theme_v1";
-  const FONT_SCALE_KEY = "salar_font_scale_v1";
+  const FONT_SCALE_KEY = "salar_font_scale_v2";
   const POST_UPDATE_KEY = "salar_post_update_v1";
   const AUTO_NEXT_DELAY_MS = 500;
 
   const MIN_FONT_SCALE = 0.8;
-  const MAX_FONT_SCALE = 1.5;
+  const MAX_FONT_SCALE = 2.0;
   const FONT_SCALE_STEP = 0.1;
+  const MOBILE_DEFAULT_FONT_SCALE = 1.5;
+  const DESKTOP_DEFAULT_FONT_SCALE = 1.0;
 
   // فهرست ۶ پایه‌ی رسمی فارسی دبستان
   const GRADES = [
@@ -270,29 +272,56 @@
     el.btnMobileMenu.textContent = isOpen ? "✕ بستن" : "☰ منو";
   }
 
-  // --- مدیریت زوم ---
-  function loadFontScale() {
-    try {
-      const saved = parseFloat(localStorage.getItem(FONT_SCALE_KEY));
-      if (!Number.isNaN(saved) && saved >= MIN_FONT_SCALE && saved <= MAX_FONT_SCALE) {
-        return Math.round(saved * 10) / 10;
-      }
-    } catch {}
-    return 1;
+  // --- مدیریت زوم (پیش‌فرض ۱۰۰٪ در ویندوز/دسکتاپ و ۱۵۰٪ در اندروید و iOS، تا سقف ۲۰۰٪) ---
+  function isMobileOS() {
+    const ua = navigator.userAgent || "";
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPad|iPhone|iPod/i.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    return isAndroid || isIOS;
   }
 
-  function applyFontScale(scale, announce) {
+  function getDefaultFontScale() {
+    return isMobileOS() ? MOBILE_DEFAULT_FONT_SCALE : DESKTOP_DEFAULT_FONT_SCALE;
+  }
+
+  function loadFontScale() {
+    try {
+      const raw = localStorage.getItem(FONT_SCALE_KEY);
+      if (raw !== null) {
+        const saved = parseFloat(raw);
+        if (!Number.isNaN(saved) && saved >= MIN_FONT_SCALE && saved <= MAX_FONT_SCALE) {
+          return Math.round(saved * 10) / 10;
+        }
+      }
+    } catch {}
+    return getDefaultFontScale();
+  }
+
+  function applyFontScale(scale, announce, persist) {
     const clamped = Math.max(MIN_FONT_SCALE, Math.min(MAX_FONT_SCALE, Math.round(scale * 10) / 10));
     currentFontScale = clamped;
+    const pct = Math.round(clamped * 100);
+    const defPct = Math.round(getDefaultFontScale() * 100);
+
     document.documentElement.style.setProperty("--font-scale", String(clamped));
     if (el.btnZoomReset) {
-      el.btnZoomReset.textContent = `${toPersianDigits(Math.round(clamped * 100))}٪`;
+      el.btnZoomReset.textContent = `${toPersianDigits(pct)}٪`;
+      el.btnZoomReset.title = `بازگرداندن اندازه متن به پیش‌فرض (${toPersianDigits(defPct)}٪)`;
     }
-    try {
-      localStorage.setItem(FONT_SCALE_KEY, String(clamped));
-    } catch {}
+    if (el.btnZoomIn) {
+      el.btnZoomIn.disabled = clamped >= MAX_FONT_SCALE;
+    }
+    if (el.btnZoomOut) {
+      el.btnZoomOut.disabled = clamped <= MIN_FONT_SCALE;
+    }
+    if (persist !== false) {
+      try {
+        localStorage.setItem(FONT_SCALE_KEY, String(clamped));
+      } catch {}
+    }
     if (announce) {
-      showToast(`اندازه متن: ${toPersianDigits(Math.round(clamped * 100))} درصد`);
+      showToast(`اندازه متن: ${toPersianDigits(pct)} درصد`);
     }
   }
 
@@ -3477,9 +3506,9 @@
     });
   });
 
-  if (el.btnZoomIn) el.btnZoomIn.addEventListener("click", () => applyFontScale(currentFontScale + FONT_SCALE_STEP, true));
-  if (el.btnZoomOut) el.btnZoomOut.addEventListener("click", () => applyFontScale(currentFontScale - FONT_SCALE_STEP, true));
-  if (el.btnZoomReset) el.btnZoomReset.addEventListener("click", () => applyFontScale(1, true));
+  if (el.btnZoomIn) el.btnZoomIn.addEventListener("click", () => applyFontScale(currentFontScale + FONT_SCALE_STEP, true, true));
+  if (el.btnZoomOut) el.btnZoomOut.addEventListener("click", () => applyFontScale(currentFontScale - FONT_SCALE_STEP, true, true));
+  if (el.btnZoomReset) el.btnZoomReset.addEventListener("click", () => applyFontScale(getDefaultFontScale(), true, true));
 
   if (el.btnFullscreen) {
     el.btnFullscreen.addEventListener("click", toggleFullscreen);
@@ -3626,7 +3655,7 @@
     navigator.storage.persist().catch(() => {});
   }
   applyTheme(currentTheme);
-  applyFontScale(currentFontScale, false);
+  applyFontScale(currentFontScale, false, false);
   updateFullscreenButton();
 
   let postUpdateData = null;
