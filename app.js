@@ -1,18 +1,25 @@
 (function () {
   "use strict";
 
-  // کلید ذخیره‌سازی سازگار با نسخه قبلی فارسی ششم تا پیشرفت‌های قبلی حفظ شود
+  // کلید ذخیره‌سازی سازگار با نسخه‌های قبلی تا پیشرفت‌های ذخیره‌شده حفظ شود
+  const APP_VERSION = "2.1";
+  const POST_UPDATE_KEY = "salar_post_update_v1";
   const STORAGE_KEY = "farsi6_emla_app_v1";
   const THEME_KEY = "salar_theme_v1";
+  const FONT_SCALE_KEY = "salar_font_scale_v1";
   const AUTO_NEXT_DELAY_MS = 500;
 
-  // فهرست ۶ مقطع ابتدایی — هر زمان فایل data/gradeX.js را آماده کردید، ready را به true تغییر دهید
+  const MIN_FONT_SCALE = 0.8;
+  const MAX_FONT_SCALE = 1.5;
+  const FONT_SCALE_STEP = 0.1;
+
+  // فهرست ۶ مقطع ابتدایی — هر ۶ پایه فعال و آماده تمرین
   const GRADES = [
-    { id: "grade1", title: "پایه اول ابتدایی", shortTitle: "فارسی اول", file: "data/grade1.js", ready: false },
-    { id: "grade2", title: "پایه دوم ابتدایی", shortTitle: "فارسی دوم", file: "data/grade2.js", ready: false },
-    { id: "grade3", title: "پایه سوم ابتدایی", shortTitle: "فارسی سوم", file: "data/grade3.js", ready: false },
-    { id: "grade4", title: "پایه چهارم ابتدایی", shortTitle: "فارسی چهارم", file: "data/grade4.js", ready: false },
-	{ id: "grade5", title: "پایه پنجم ابتدایی", shortTitle: "فارسی پنجم", file: "data/grade5.js", ready: true },
+    { id: "grade1", title: "پایه اول ابتدایی", shortTitle: "فارسی اول", file: "data/grade1.js", ready: true },
+    { id: "grade2", title: "پایه دوم ابتدایی", shortTitle: "فارسی دوم", file: "data/grade2.js", ready: true },
+    { id: "grade3", title: "پایه سوم ابتدایی", shortTitle: "فارسی سوم", file: "data/grade3.js", ready: true },
+    { id: "grade4", title: "پایه چهارم ابتدایی", shortTitle: "فارسی چهارم", file: "data/grade4.js", ready: true },
+    { id: "grade5", title: "پایه پنجم ابتدایی", shortTitle: "فارسی پنجم", file: "data/grade5.js", ready: true },
     { id: "grade6", title: "پایه ششم ابتدایی", shortTitle: "فارسی ششم", file: "data/grade6.js", ready: true }
   ];
 
@@ -21,6 +28,9 @@
 
   let state = loadState();
   let currentTheme = loadTheme();
+  let currentFontScale = loadFontScale();
+  let deferredInstallPrompt = null;
+
   let activeGrade = null;   // شیء پایه انتخاب‌شده
   let selectedLesson = null; // id درس یا "all"
   let currentLessons = [];
@@ -33,8 +43,14 @@
 
   const el = {
     navBrand: document.getElementById("nav-brand"),
+    navLinks: document.getElementById("nav-links"),
     navBtns: document.querySelectorAll(".nav-btn"),
+    btnMobileMenu: document.getElementById("btn-mobile-menu"),
     btnThemeToggle: document.getElementById("btn-theme-toggle"),
+    btnFullscreen: document.getElementById("btn-fullscreen"),
+    btnZoomIn: document.getElementById("btn-zoom-in"),
+    btnZoomOut: document.getElementById("btn-zoom-out"),
+    btnZoomReset: document.getElementById("btn-zoom-reset"),
 
     pageTitle: document.getElementById("page-title"),
     btnTopBack: document.getElementById("btn-top-back"),
@@ -44,8 +60,15 @@
     lessonView: document.getElementById("lesson-view"),
     quizView: document.getElementById("quiz-view"),
     resultView: document.getElementById("result-view"),
+    installView: document.getElementById("install-view"),
     aboutView: document.getElementById("about-view"),
     namingView: document.getElementById("naming-view"),
+
+    directInstallCard: document.getElementById("direct-install-card"),
+    btnPwaInstall: document.getElementById("btn-pwa-install"),
+    btnCheckUpdate: document.getElementById("btn-check-update"),
+    appVersionLabel: document.getElementById("app-version-label"),
+    updateStatusBox: document.getElementById("update-status-box"),
 
     resumeCard: document.getElementById("resume-card"),
     resumeText: document.getElementById("resume-text"),
@@ -55,6 +78,10 @@
     gradesGrid: document.getElementById("grades-grid"),
     lessonsGrid: document.getElementById("lessons-grid"),
     btnGradeResetAll: document.getElementById("btn-grade-reset-all"),
+
+    spellingModeTitle: document.getElementById("spelling-mode-title"),
+    meaningModeTitle: document.getElementById("meaning-mode-title"),
+    meaningModeBadge: document.getElementById("meaning-mode-badge"),
 
     statSpTotal: document.getElementById("stat-sp-total"),
     statSpOk: document.getElementById("stat-sp-ok"),
@@ -96,6 +123,243 @@
     toast: document.getElementById("toast")
   };
 
+  function toPersianDigits(num) {
+    return String(num).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+  }
+
+  // --- مدیریت منوی موبایل ---
+  function closeMobileMenu() {
+    if (!el.navLinks || !el.btnMobileMenu) return;
+    el.navLinks.classList.remove("mobile-open");
+    el.btnMobileMenu.setAttribute("aria-expanded", "false");
+    el.btnMobileMenu.textContent = "☰ منو";
+  }
+
+  function toggleMobileMenu() {
+    if (!el.navLinks || !el.btnMobileMenu) return;
+    const isOpen = el.navLinks.classList.toggle("mobile-open");
+    el.btnMobileMenu.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    el.btnMobileMenu.textContent = isOpen ? "✕ بستن" : "☰ منو";
+  }
+
+  // --- مدیریت زوم (بزرگ‌نمایی و کوچک‌نمایی متن‌ها در ویندوز، اندروید و iOS) ---
+  function loadFontScale() {
+    try {
+      const saved = parseFloat(localStorage.getItem(FONT_SCALE_KEY));
+      if (!Number.isNaN(saved) && saved >= MIN_FONT_SCALE && saved <= MAX_FONT_SCALE) {
+        return Math.round(saved * 10) / 10;
+      }
+    } catch {}
+    return 1;
+  }
+
+  function applyFontScale(scale, announce) {
+    const clamped = Math.max(MIN_FONT_SCALE, Math.min(MAX_FONT_SCALE, Math.round(scale * 10) / 10));
+    currentFontScale = clamped;
+    document.documentElement.style.setProperty("--font-scale", String(clamped));
+    if (el.btnZoomReset) {
+      el.btnZoomReset.textContent = `${toPersianDigits(Math.round(clamped * 100))}٪`;
+    }
+    try {
+      localStorage.setItem(FONT_SCALE_KEY, String(clamped));
+    } catch {}
+    if (announce) {
+      showToast(`اندازه متن: ${toPersianDigits(Math.round(clamped * 100))} درصد`);
+    }
+  }
+
+  // --- مدیریت تمام‌نما (Fullscreen) ---
+  function isFullscreenSupported() {
+    const doc = document;
+    const root = document.documentElement;
+    return Boolean(
+      (doc.fullscreenEnabled || doc.webkitFullscreenEnabled) &&
+      (root.requestFullscreen || root.webkitRequestFullscreen)
+    );
+  }
+
+  function isFullscreenActive() {
+    return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function isStandaloneMobile() {
+    const isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
+    const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    return Boolean(isStandalone && isCoarsePointer);
+  }
+
+  function updateFullscreenButton() {
+    if (!el.btnFullscreen) return;
+    // در iOS (عدم پشتیبانی API) و در حالت PWA نصب‌شده روی گوشی موبایل دکمه تمام‌نما مخفی می‌شود
+    if (!isFullscreenSupported() || isStandaloneMobile()) {
+      el.btnFullscreen.classList.add("hidden");
+      return;
+    }
+    el.btnFullscreen.classList.remove("hidden");
+    if (isFullscreenActive()) {
+      el.btnFullscreen.textContent = "✕ خروج تمام‌نما";
+      el.btnFullscreen.title = "خروج از حالت تمام‌نما (Esc)";
+    } else {
+      el.btnFullscreen.textContent = "⛶ تمام‌نما";
+      el.btnFullscreen.title = "نمایش تمام‌نما";
+    }
+  }
+
+  function toggleFullscreen() {
+    if (!isFullscreenSupported()) return;
+    if (isFullscreenActive()) {
+      const exitFn = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exitFn) {
+        Promise.resolve(exitFn.call(document)).catch(() => {});
+      }
+    } else {
+      const root = document.documentElement;
+      const reqFn = root.requestFullscreen || root.webkitRequestFullscreen;
+      if (reqFn) {
+        Promise.resolve(reqFn.call(root)).catch(() => {
+          showToast("امکان فعال‌سازی تمام‌نما در این مرورگر وجود ندارد.");
+        });
+      }
+    }
+  }
+
+  // --- مدیریت نصب آفلاین (PWA) و بررسی نسخه جدید ---
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    if (el.directInstallCard) {
+      el.directInstallCard.classList.remove("hidden");
+    }
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    if (el.directInstallCard) {
+      el.directInstallCard.classList.add("hidden");
+    }
+    showToast("نرم‌افزار سالار با موفقیت نصب شد!");
+  });
+
+  function triggerPwaInstall() {
+    if (!deferredInstallPrompt) {
+      showToast("از راهنمای زیر برای نصب از منوی مرورگر استفاده کنید.");
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => {
+      deferredInstallPrompt = null;
+      if (el.directInstallCard) {
+        el.directInstallCard.classList.add("hidden");
+      }
+    }).catch(() => {});
+  }
+
+  function showUpdateStatus(type, message) {
+    if (!el.updateStatusBox) return;
+    el.updateStatusBox.className = `update-status-box ${type}`;
+    el.updateStatusBox.textContent = message;
+  }
+
+  function compareVersions(v1, v2) {
+    const a = String(v1 || "0").split(".").map((n) => parseInt(n, 10) || 0);
+    const b = String(v2 || "0").split(".").map((n) => parseInt(n, 10) || 0);
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+      const x = a[i] || 0;
+      const y = b[i] || 0;
+      if (x !== y) return x > y ? 1 : -1;
+    }
+    return 0;
+  }
+
+  async function checkAppUpdate() {
+    if (window.location.protocol === "file:") {
+      showUpdateStatus("warn", "⚠️ بررسی نسخه جدید فقط هنگام اجرا از طریق اینترنت (سایت یا نسخه نصب‌شده PWA) فعال است.");
+      return;
+    }
+
+    if (!navigator.onLine) {
+      showUpdateStatus("warn", "⚠️ دستگاه شما به اینترنت متصل نیست. برای بررسی نسخه جدید ابتدا اینترنت را روشن کنید.");
+      showToast("اتصال اینترنت برقرار نیست.");
+      return;
+    }
+
+    if (el.btnCheckUpdate) {
+      el.btnCheckUpdate.disabled = true;
+      el.btnCheckUpdate.textContent = "در حال بررسی...";
+    }
+    showUpdateStatus("info", "🔎 در حال بررسی وجود نسخه جدید روی سرور...");
+
+    try {
+      let remoteVersion = null;
+      let remoteNotes = "";
+
+      const res = await fetch(`./version.json?t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.version) {
+          remoteVersion = String(data.version).trim();
+          remoteNotes = data.notes ? String(data.notes).trim() : "";
+        }
+      }
+
+      let swHasUpdate = false;
+      let swReg = null;
+      if ("serviceWorker" in navigator) {
+        swReg = await navigator.serviceWorker.getRegistration();
+        if (swReg) {
+          await swReg.update().catch(() => {});
+          if (swReg.waiting || swReg.installing) {
+            swHasUpdate = true;
+          }
+        }
+      }
+
+      const hasNewerVersion = remoteVersion && compareVersions(remoteVersion, APP_VERSION) > 0;
+
+      if (!hasNewerVersion && !swHasUpdate) {
+        const verFa = toPersianDigits(APP_VERSION);
+        showUpdateStatus("ok", `✅ نرم‌افزار شما به‌روز است (نسخه ${verFa} — آخرین نسخه).`);
+        showToast("نرم‌افزار شما به‌روز است.");
+        if (el.btnCheckUpdate) {
+          el.btnCheckUpdate.disabled = false;
+          el.btnCheckUpdate.textContent = "بررسی و دریافت نسخه جدید";
+        }
+        return;
+      }
+
+      const targetVer = remoteVersion || APP_VERSION;
+      showUpdateStatus("info", `⬇️ نسخه جدید (${toPersianDigits(targetVer)}) یافت شد! در حال دریافت و به‌روزرسانی...`);
+
+      if (swReg && swReg.waiting) {
+        swReg.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+
+      try {
+        sessionStorage.setItem(POST_UPDATE_KEY, JSON.stringify({
+          from: APP_VERSION,
+          to: targetVer,
+          notes: remoteNotes
+        }));
+      } catch {}
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 900);
+    } catch {
+      showUpdateStatus("warn", "⚠️ خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.");
+      showToast("خطا در بررسی نسخه جدید.");
+      if (el.btnCheckUpdate) {
+        el.btnCheckUpdate.disabled = false;
+        el.btnCheckUpdate.textContent = "بررسی و دریافت نسخه جدید";
+      }
+    }
+  }
+
   // --- مدیریت تم ---
   function loadTheme() {
     try {
@@ -108,7 +372,11 @@
   function applyTheme(theme) {
     currentTheme = theme === "light" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", currentTheme);
-    el.btnThemeToggle.textContent = currentTheme === "dark" ? "☀️ تم روشن" : "🌙 تم تیره";
+    el.btnThemeToggle.textContent = currentTheme === "dark" ? "☀️ روشن" : "🌙 تیره";
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute("content", currentTheme === "dark" ? "#0f172a" : "#ffffff");
+    }
     try {
       localStorage.setItem(THEME_KEY, currentTheme);
     } catch {}
@@ -146,7 +414,7 @@
     el.toast.textContent = msg;
     el.toast.classList.remove("hidden");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.toast.classList.add("hidden"), 2500);
+    toastTimer = setTimeout(() => el.toast.classList.add("hidden"), 2600);
   }
 
   function clearAutoNext() {
@@ -165,7 +433,7 @@
     return copy;
   }
 
-  // --- بارگذاری پویای فایل داده‌ی هر پایه (سازگار با آنلاین و اجرای آفلاین روی هارد) ---
+  // --- بارگذاری پویای فایل داده‌ی هر پایه ---
   function loadGradeData(grade) {
     return new Promise((resolve, reject) => {
       if (Array.isArray(window.SALAR_DATA[grade.id])) {
@@ -186,7 +454,7 @@
           reject(new Error("داده‌ای در فایل پایه یافت نشد."));
         }
       };
-      script.onerror = () => reject(new Error("فایل این پایه هنوز اضافه نشده است."));
+      script.onerror = () => reject(new Error("فایل این پایه هنوز بارگذاری نشده است."));
       document.body.appendChild(script);
     });
   }
@@ -242,13 +510,16 @@
   }
 
   function showView(viewName) {
+    closeMobileMenu();
     el.gradesView.classList.toggle("hidden", viewName !== "grades");
     el.gradeHomeView.classList.toggle("hidden", viewName !== "gradeHome");
     el.lessonView.classList.toggle("hidden", viewName !== "lesson");
     el.quizView.classList.toggle("hidden", viewName !== "quiz");
     el.resultView.classList.toggle("hidden", viewName !== "result");
+    el.installView.classList.toggle("hidden", viewName !== "install");
     el.aboutView.classList.toggle("hidden", viewName !== "about");
     el.namingView.classList.toggle("hidden", viewName !== "naming");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function configureHeader(title, tabTitle, backLabel, backHandler) {
@@ -268,13 +539,21 @@
   function renderGrades() {
     clearAutoNext();
     setActiveNav("grades");
-    configureHeader("انتخاب مقطع تحصیلی", "سالار — مقاطع تحصیلی", null, null);
+    configureHeader(
+      "انتخاب مقطع تحصیلی",
+      "سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان",
+      null,
+      null
+    );
 
     const s = state.activeSession;
     if (s && Array.isArray(s.queue) && s.currentIndex < s.queue.length) {
       const gradeObj = GRADES.find((g) => g.id === (s.gradeId || "grade6"));
       const gradeName = gradeObj ? gradeObj.shortTitle : "فارسی ششم";
-      const modeName = s.mode === "spelling" ? "بخش املا" : "بخش معنی لغات";
+      const isG1 = (s.gradeId || "grade6") === "grade1";
+      const modeName = s.mode === "spelling"
+        ? "بخش املا"
+        : (isG1 ? "بخش صداشناسی و معنا" : "بخش معنی لغات");
       const reviewTag = s.reviewOnly ? " (مرور اشتباهات)" : "";
       el.resumeText.textContent =
         `${gradeName} • ${modeName}${reviewTag} • سؤال ${s.currentIndex + 1} از ${s.queue.length}`;
@@ -334,15 +613,14 @@
     clearAutoNext();
     setActiveNav("grades");
     configureHeader(
-      `تمرین املا و معنی ${activeGrade.shortTitle}`,
-      activeGrade.shortTitle,
+      `تمرین املا و لغت ${activeGrade.shortTitle}`,
+      `${activeGrade.shortTitle} — سالار`,
       "تغییر مقطع",
       renderGrades
     );
 
     el.lessonsGrid.innerHTML = "";
 
-    // دکمه «همه درس‌ها» با عرض دو برابر و استایل یکدست
     const allCounts = getCombinedCounts("all");
     const allItem = document.createElement("div");
     allItem.className = "lesson-item lesson-item-all";
@@ -368,7 +646,6 @@
     allItem.appendChild(btnAllMain);
     el.lessonsGrid.appendChild(allItem);
 
-    // دکمه‌های تک‌تک درس‌ها همراه با دکمه ریست کوچک
     currentLessons.forEach((lesson) => {
       const counts = getCombinedCounts(lesson.id);
       const item = document.createElement("div");
@@ -396,8 +673,8 @@
       const resetBtn = document.createElement("button");
       resetBtn.type = "button";
       resetBtn.className = "lesson-reset-btn";
-      resetBtn.title = `ریست ${lesson.title}`;
-      resetBtn.textContent = "ریست";
+      resetBtn.title = `بازنشانی ${lesson.title}`;
+      resetBtn.textContent = "بازنشانی";
       resetBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         resetLessonById(lesson.id, true);
@@ -418,10 +695,23 @@
     const label = getScopeLabel(scope);
     configureHeader(
       `${activeGrade.shortTitle} — ${label}`,
-      label,
+      `${label} — سالار`,
       "بازگشت به فهرست درس‌ها",
       renderGradeHome
     );
+
+    const isGrade1 = activeGrade && activeGrade.id === "grade1";
+    if (el.meaningModeTitle && el.meaningModeBadge) {
+      if (isGrade1) {
+        el.meaningModeTitle.textContent = "بخش صداشناسی و معنا";
+        el.meaningModeBadge.textContent = "تشخیص صداها و درک ساده";
+        el.btnStartMeaning.textContent = "شروع تمرین صداشناسی و معنا";
+      } else {
+        el.meaningModeTitle.textContent = "بخش معنی لغات";
+        el.meaningModeBadge.textContent = "یادگیری معنای واژه‌ها";
+        el.btnStartMeaning.textContent = "شروع تمرین معنی";
+      }
+    }
 
     updateModeStats("spelling", el.statSpTotal, el.statSpOk, el.statSpWrong, el.cntSpWrong, el.btnReviewSpelling);
     updateModeStats("meaning", el.statMnTotal, el.statMnOk, el.statMnWrong, el.cntMnWrong, el.btnReviewMeaning);
@@ -535,12 +825,15 @@
     const scopeLabel = getScopeLabel(s.lessonScope);
     configureHeader(
       `${activeGrade.shortTitle} — ${scopeLabel}`,
-      scopeLabel,
+      `${scopeLabel} — سالار`,
       "بازگشت به فهرست درس‌ها",
       renderGradeHome
     );
 
-    const modeLabel = s.mode === "spelling" ? "املا" : "معنی لغات";
+    const isGrade1 = activeGrade && activeGrade.id === "grade1";
+    const modeLabel = s.mode === "spelling"
+      ? "املا"
+      : (isGrade1 ? "صداشناسی و معنا" : "معنی لغات");
     el.quizTitle.textContent = s.reviewOnly ? `مرور اشتباهات ${modeLabel}` : `تمرین ${modeLabel}`;
     el.quizProgressText.textContent = `سؤال ${currentQuestionIndex + 1} از ${s.queue.length}`;
     el.progressBar.style.width = `${(currentQuestionIndex / s.queue.length) * 100}%`;
@@ -687,7 +980,26 @@
     openLesson(targetScope);
   }
 
-  // --- صفحات درباره و نام‌گذاری ---
+  // --- صفحات نصب آفلاین، درباره و نام‌گذاری ---
+  function renderInstall(keepStatus) {
+    clearAutoNext();
+    setActiveNav("install");
+    if (el.appVersionLabel) {
+      el.appVersionLabel.textContent = toPersianDigits(APP_VERSION);
+    }
+    if (!keepStatus && el.updateStatusBox) {
+      el.updateStatusBox.className = "update-status-box hidden";
+      el.updateStatusBox.textContent = "";
+    }
+    configureHeader(
+      "نحوه نصب آفلاین و به‌روزرسانی",
+      "نصب آفلاین نرم‌افزار سالار",
+      "مقاطع تحصیلی",
+      renderGrades
+    );
+    showView("install");
+  }
+
   function renderAbout() {
     clearAutoNext();
     setActiveNav("about");
@@ -723,7 +1035,7 @@
     } else {
       openLesson(lessonId);
     }
-    showToast(`اطلاعات ${title} ریست شد.`);
+    showToast(`اطلاعات ${title} بازنشانی شد.`);
   }
 
   function resetCurrentGrade(stayOnGradeHome) {
@@ -744,19 +1056,47 @@
     } else {
       openLesson("all");
     }
-    showToast(`اطلاعات ${activeGrade.shortTitle} ریست شد.`);
+    showToast(`اطلاعات ${activeGrade.shortTitle} بازنشانی شد.`);
   }
 
   // --- رویدادها ---
   el.navBrand.addEventListener("click", renderGrades);
+  if (el.btnMobileMenu) {
+    el.btnMobileMenu.addEventListener("click", toggleMobileMenu);
+  }
+
   el.navBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.nav;
       if (target === "grades") renderGrades();
+      else if (target === "install") renderInstall();
       else if (target === "about") renderAbout();
       else if (target === "naming") renderNaming();
     });
   });
+
+  if (el.btnZoomIn) {
+    el.btnZoomIn.addEventListener("click", () => applyFontScale(currentFontScale + FONT_SCALE_STEP, true));
+  }
+  if (el.btnZoomOut) {
+    el.btnZoomOut.addEventListener("click", () => applyFontScale(currentFontScale - FONT_SCALE_STEP, true));
+  }
+  if (el.btnZoomReset) {
+    el.btnZoomReset.addEventListener("click", () => applyFontScale(1, true));
+  }
+
+  if (el.btnFullscreen) {
+    el.btnFullscreen.addEventListener("click", toggleFullscreen);
+    document.addEventListener("fullscreenchange", updateFullscreenButton);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
+  }
+
+  if (el.btnPwaInstall) {
+    el.btnPwaInstall.addEventListener("click", triggerPwaInstall);
+  }
+  if (el.btnCheckUpdate) {
+    el.btnCheckUpdate.addEventListener("click", checkAppUpdate);
+  }
 
   el.btnThemeToggle.addEventListener("click", () => {
     applyTheme(currentTheme === "dark" ? "light" : "dark");
@@ -802,5 +1142,25 @@
   });
 
   applyTheme(currentTheme);
-  renderGrades();
+  applyFontScale(currentFontScale, false);
+  updateFullscreenButton();
+
+  let postUpdateData = null;
+  try {
+    const rawUpdate = sessionStorage.getItem(POST_UPDATE_KEY);
+    if (rawUpdate) {
+      postUpdateData = JSON.parse(rawUpdate);
+      sessionStorage.removeItem(POST_UPDATE_KEY);
+    }
+  } catch {}
+
+  if (postUpdateData) {
+    renderInstall(true);
+    const verFa = toPersianDigits(APP_VERSION);
+    const notesPart = postUpdateData.notes ? ` — ${postUpdateData.notes}` : "";
+    showUpdateStatus("ok", `🎉 نرم‌افزار با موفقیت به نسخه ${verFa} به‌روزرسانی شد!${notesPart}`);
+    showToast(`به‌روزرسانی به نسخه ${verFa} انجام شد.`);
+  } else {
+    renderGrades();
+  }
 })();

@@ -2,29 +2,102 @@
 <html lang="fa" dir="rtl" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="نرم‌افزار آموزشی سالار؛ تمرین تعاملی املا و معنی لغات فارسی اول تا ششم دبستان به صورت آفلاین و قابل نصب.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="نرم‌افزار تعاملی املا و لغت فارسی دبستان (سالار)؛ تمرین رایگان و آفلاین املا، معنی لغات و صداشناسی فارسی اول تا ششم ابتدایی روی گوشی اندروید، آیفون و ویندوز.">
+  <meta name="keywords" content="نرم افزار املا دبستان, تمرین املا فارسی ابتدایی, معنی لغات فارسی دبستان, املا اول دبستان, املا دوم دبستان, املا سوم دبستان, املا چهارم دبستان, املا پنجم دبستان, املا ششم دبستان, بازی املا فارسی, اپلیکیشن املا آفلاین, نرم افزار سالار">
+  <meta name="author" content="مهدی قربعلی پوردرو">
+  <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0f172a">
-  <title>سالار — تمرین املا و معنی فارسی دبستان</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="سالار">
+
+  <link rel="canonical" href="https://ghorbalipour.github.io/salar/">
+
+  <!-- متاتگ‌های اشتراک‌گذاری در تلگرام، ایتا، بله، شاد و شبکه‌های اجتماعی -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fa_IR">
+  <meta property="og:site_name" content="نرم‌افزار آموزشی سالار">
+  <meta property="og:title" content="سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان (اول تا ششم)">
+  <meta property="og:description" content="تمرین هوشمند، رایگان و آفلاین املا و معنی لغات فارسی پایه‌های اول تا ششم دبستان؛ با مرور خودکار اشتباهات و قابل نصب روی گوشی و کامپیوتر.">
+  <meta property="og:url" content="https://ghorbalipour.github.io/salar/">
+  <meta property="og:image" content="https://ghorbalipour.github.io/salar/images/icon-512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان">
+  <meta name="twitter:description" content="تمرین رایگان و آفلاین املا و معنی لغات فارسی اول تا ششم ابتدایی.">
+  <meta name="twitter:image" content="https://ghorbalipour.github.io/salar/images/icon-512.png">
+
+  <title>سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان (اول تا ششم)</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="images/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="images/icon-192.png">
   <link rel="stylesheet" href="style.css">
+
+  <!-- داده‌های ساختاریافته (Schema.org) برای نمایش بهتر در نتایج گوگل -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "سالار — نرم‌افزار تعاملی املا و لغت فارسی دبستان",
+    "alternateName": "نرم‌افزار آموزشی سالار",
+    "description": "نرم‌افزار تعاملی، رایگان و آفلاین برای تمرین املا، صداشناسی و معنی لغات کتاب فارسی پایه‌های اول تا ششم ابتدایی با قابلیت مرور هوشمند اشتباهات.",
+    "applicationCategory": "EducationalApplication",
+    "educationalLevel": "Primary School (Grades 1 to 6)",
+    "inLanguage": "fa",
+    "operatingSystem": "Windows, Android, iOS, macOS",
+    "isAccessibleForFree": true,
+    "author": {
+      "@type": "Person",
+      "name": "مهدی قربعلی پوردرو",
+      "url": "https://github.com/ghorbalipour/"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "IRR"
+    },
+    "image": "https://ghorbalipour.github.io/salar/images/icon-512.png",
+    "url": "https://ghorbalipour.github.io/salar/"
+  }
+  </script>
 </head>
 <body>
   <!-- منوی ثابت بالای همه صفحات -->
-  <nav class="navbar">
+  <nav class="navbar" aria-label="منوی اصلی">
     <div class="navbar-inner">
-      <button id="nav-brand" class="brand-btn" type="button" title="صفحه انتخاب مقاطع">
-        <img src="images/icon-192.png" alt="لوگوی سالار" class="brand-logo">
-        <span class="brand-name">سالار</span>
-      </button>
+      <div class="navbar-top-row">
+        <!-- گوشه بالا و سمت راست: تصویر + سالار و زیرعنوان با فونت کوچک‌تر -->
+        <button id="nav-brand" class="brand-btn" type="button" title="صفحه انتخاب مقاطع">
+          <span class="brand-top">
+            <img src="images/icon-192.png" alt="لوگوی نرم‌افزار سالار" class="brand-logo">
+            <span class="brand-name">سالار</span>
+          </span>
+          <span class="brand-tagline">نرم‌افزار تعاملی املا و لغت فارسی دبستان</span>
+        </button>
 
-      <div class="nav-links">
+        <!-- دکمه‌های کاربردی سریع (زوم، تمام‌نما، تم، منوی موبایل) -->
+        <div class="toolbar-controls">
+          <div class="zoom-group" role="group" aria-label="تنظیم اندازه متن">
+            <button id="btn-zoom-in" class="tool-btn" type="button" title="بزرگ‌تر کردن متن" aria-label="بزرگ‌تر کردن متن">آ+</button>
+            <button id="btn-zoom-reset" class="tool-btn tool-btn-pct" type="button" title="بازگرداندن اندازه متن به حالت عادی">۱۰۰٪</button>
+            <button id="btn-zoom-out" class="tool-btn" type="button" title="کوچک‌تر کردن متن" aria-label="کوچک‌تر کردن متن">آ-</button>
+          </div>
+
+          <button id="btn-fullscreen" class="tool-btn hidden" type="button" title="نمایش تمام‌نما" aria-label="نمایش تمام‌نما">⛶ تمام‌نما</button>
+          <button id="btn-theme-toggle" class="tool-btn" type="button" title="تغییر تم روشن و تیره">☀️ روشن</button>
+          <button id="btn-mobile-menu" class="tool-btn mobile-menu-btn" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="باز کردن منو">☰ منو</button>
+        </div>
+      </div>
+
+      <!-- لینک‌های ناوبری -->
+      <div id="nav-links" class="nav-links">
         <button class="nav-btn active" data-nav="grades" type="button">مقاطع تحصیلی</button>
+        <button class="nav-btn" data-nav="install" type="button">نصب آفلاین</button>
         <button class="nav-btn" data-nav="about" type="button">درباره</button>
         <button class="nav-btn" data-nav="naming" type="button">نام‌گذاری نرم‌افزار</button>
-        <button id="btn-theme-toggle" class="btn btn-outline btn-sm" type="button">☀️ تم روشن</button>
       </div>
     </div>
   </nav>
@@ -51,7 +124,17 @@
       </section>
 
       <p class="section-subtitle">لطفاً پایه تحصیلی دانش‌آموز را انتخاب کنید:</p>
-      <section id="grades-grid" class="grades-grid"></section>
+      <section id="grades-grid" class="grades-grid" aria-label="پایه‌های اول تا ششم ابتدایی"></section>
+
+      <!-- بخش معرفی کوتاه و مفید برای کاربران و موتورهای جستجو (SEO) -->
+      <section class="card seo-intro-card" aria-label="معرفی نرم‌افزار سالار">
+        <h2>تمرین تعاملی املا و معنی لغات فارسی اول تا ششم دبستان</h2>
+        <p>
+          نرم‌افزار آموزشی <strong>سالار</strong> تمامی درس‌های کتاب فارسی دوره‌ی ابتدایی (پایه اول تا ششم) را به صورت
+          <strong>درس‌به‌درس</strong> و <strong>آزمون جامع</strong> پوشش می‌دهد. دانش‌آموز می‌تواند به شکل رایگان و بدون نیاز به اینترنت،
+          املای واژگان دشوار، صداشناسی کلاس اول و معنی لغات و کنایه‌های فارسی را تمرین کند و پاسخ‌های نادرست خود را دوباره مرور نماید.
+        </p>
+      </section>
     </main>
 
     <!-- ۲. صفحه فهرست درس‌های مقطع انتخاب‌شده -->
@@ -60,7 +143,7 @@
 
       <footer class="page-bottom-bar">
         <button class="btn btn-outline btn-sm js-go-grades" type="button">تغییر مقطع تحصیلی</button>
-        <button id="btn-grade-reset-all" class="btn btn-danger-outline btn-sm" type="button">ریست همه درس‌های این پایه</button>
+        <button id="btn-grade-reset-all" class="btn btn-danger-outline btn-sm" type="button">بازنشانی همه درس‌های این پایه</button>
       </footer>
     </main>
 
@@ -69,7 +152,7 @@
       <section class="modes-grid">
         <div class="card mode-card">
           <div class="mode-header">
-            <h2>بخش املا</h2>
+            <h2 id="spelling-mode-title">بخش املا</h2>
             <span class="badge badge-blue">تشخیص نوشتار درست</span>
           </div>
           <div class="stats-row">
@@ -87,8 +170,8 @@
 
         <div class="card mode-card">
           <div class="mode-header">
-            <h2>بخش معنی لغات</h2>
-            <span class="badge badge-teal">یادگیری معنای واژه‌ها</span>
+            <h2 id="meaning-mode-title">بخش معنی لغات</h2>
+            <span id="meaning-mode-badge" class="badge badge-teal">یادگیری معنای واژه‌ها</span>
           </div>
           <div class="stats-row">
             <div>کل سؤالات: <strong id="stat-mn-total">0</strong></div>
@@ -106,9 +189,9 @@
 
       <footer class="page-bottom-bar">
         <button class="btn btn-outline btn-sm js-go-grade-home" type="button">بازگشت به فهرست درس‌ها</button>
-        <div>
-          <button id="btn-reset-lesson" class="btn btn-ghost btn-sm text-red" type="button">ریست این درس</button>
-          <button id="btn-reset-all" class="btn btn-ghost btn-sm text-red hidden" type="button">ریست همه درس‌های این پایه</button>
+        <div class="bottom-bar-actions">
+          <button id="btn-reset-lesson" class="btn btn-ghost btn-sm text-red" type="button">بازنشانی این درس</button>
+          <button id="btn-reset-all" class="btn btn-ghost btn-sm text-red hidden" type="button">بازنشانی همه درس‌های این پایه</button>
         </div>
       </footer>
     </main>
@@ -171,24 +254,101 @@
       </footer>
     </main>
 
-    <!-- ۶. صفحه «درباره نرم‌افزار» -->
+    <!-- ۶. صفحه «نحوه نصب آفلاین و به‌روزرسانی» -->
+    <main id="install-view" class="hidden">
+      <!-- کارت نصب مستقیم (در کروم و اج اندروید و ویندوز فعال می‌شود) -->
+      <section id="direct-install-card" class="card install-hero-card hidden">
+        <div>
+          <span class="badge badge-teal">نصب سریع و خودکار</span>
+          <h2>نصب مستقیم نرم‌افزار سالار روی این دستگاه</h2>
+          <p>مرورگر شما از نصب مستقیم پشتیبانی می‌کند. با زدن دکمه‌ی زیر، آیکون «سالار» روی دستگاه شما اضافه می‌شود و بدون اینترنت کار می‌کند.</p>
+        </div>
+        <button id="btn-pwa-install" class="btn btn-primary" type="button">📲 نصب نرم‌افزار سالار</button>
+      </section>
+
+      <section class="card info-card">
+        <h2>چرا «سالار» را به صورت آفلاین نصب کنیم؟</h2>
+        <p>
+          نرم‌افزار سالار یک وب‌اپلیکیشن پیشرفته (PWA) است؛ یعنی بدون نیاز به دانلود فایل نصبی از فروشگاه‌ها،
+          تنها با چند کلیک مانند یک برنامه‌ی کامل روی گوشی، تبلت یا کامپیوتر شما نصب می‌شود و پس از آن
+          <strong>بدون نیاز به اینترنت</strong> قابل استفاده است.
+        </p>
+
+        <div class="install-grid">
+          <article class="install-box">
+            <h3>🤖 نصب روی گوشی و تبلت اندروید</h3>
+            <ol class="install-steps">
+              <li>سایت سالار را با مرورگر <strong>گوگل کروم (Chrome)</strong> باز کنید.</li>
+              <li>در گوشه‌ی بالای مرورگر روی آیکون <strong>سه‌نقطه (⋮)</strong> بزنید.</li>
+              <li>گزینه‌ی <strong>«نصب برنامه» (Install app)</strong> یا <strong>«افزودن به صفحه‌ی اصلی» (Add to Home screen)</strong> را انتخاب کنید.</li>
+              <li>روی <strong>نصب (Install)</strong> بزنید تا آیکون «سالار» کنار سایر برنامه‌های گوشی شما ظاهر شود.</li>
+            </ol>
+          </article>
+
+          <article class="install-box">
+            <h3>🍎 نصب روی آیفون و آیپد (iOS)</h3>
+            <ol class="install-steps">
+              <li>سایت سالار را حتماً با مرورگر <strong>سافاری (Safari)</strong> باز کنید.</li>
+              <li>در نوار پایین صفحه روی دکمه‌ی <strong>اشتراک‌گذاری (Share / مربع با فلش رو به بالا)</strong> بزنید.</li>
+              <li>صفحه را کمی به پایین بکشید و گزینه‌ی <strong>Add to Home Screen</strong> را انتخاب کنید.</li>
+              <li>در گوشه‌ی بالا روی <strong>Add</strong> بزنید تا آیکون سالار روی صفحه‌ی اصلی اضافه شود و تمام‌صفحه اجرا گردد.</li>
+            </ol>
+          </article>
+
+          <article class="install-box">
+            <h3>💻 نصب روی کامپیوتر و لپ‌تاپ ویندوز</h3>
+            <ol class="install-steps">
+              <li>سایت سالار را در مرورگر <strong>Chrome</strong> یا <strong>Microsoft Edge</strong> باز کنید.</li>
+              <li>در انتهای نوار آدرس بالا، روی آیکون کوچک <strong>نصب (شبیه مانیتور با فلش پایین)</strong> کلیک کنید.</li>
+              <li>اگر آن آیکون را ندیدید، از منوی سه‌نقطه‌ی مرورگر گزینه‌ی <strong>Apps / Save and share ← Install Salar</strong> را بزنید.</li>
+              <li>برنامه مثل یک نرم‌افزار ویندوزی در دسکتاپ و منوی Start قرار می‌گیرد و آفلاین کار می‌کند.</li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <section class="card info-card update-card">
+        <div class="update-header">
+          <div>
+            <h2>🔄 نحوه دریافت نسخه‌ی جدیدتر (به‌روزرسانی)</h2>
+            <p class="text-muted">نسخه‌ی فعلی نصب‌شده روی دستگاه شما: <strong id="app-version-label">۲.۱</strong></p>
+          </div>
+          <button id="btn-check-update" class="btn btn-primary" type="button">بررسی و دریافت نسخه جدید</button>
+        </div>
+        <div id="update-status-box" class="update-status-box hidden" role="status" aria-live="polite"></div>
+        <ul class="info-list">
+          <li><strong>به‌روزرسانی خودکار:</strong> هر زمان اینترنت دستگاه شما وصل باشد و نرم‌افزار سالار را باز کنید، برنامه به صورت خودکار فایل‌های جدیدتر را در پس‌زمینه دریافت می‌کند و در اجرای بعدی نسخه‌ی تازه نمایش داده می‌شود.</li>
+          <li><strong>به‌روزرسانی دستی و فوری:</strong> در حالی که به اینترنت متصل هستید، کافی است روی دکمه‌ی <strong>«بررسی و دریافت نسخه جدید»</strong> در بالا بزنید (یا در ویندوز کلیدهای <code>Ctrl + F5</code> را فشار دهید).</li>
+          <li><strong>حفظ کامل پیشرفت دانش‌آموز:</strong> نگران پاک شدن امتیازها و اشتباهات ثبت‌شده نباشید؛ با به‌روزرسانی نرم‌افزار، پیشرفت‌های ذخیره‌شده‌ی دانش‌آموز کاملاً حفظ می‌شود.</li>
+        </ul>
+      </section>
+
+      <footer class="page-bottom-bar">
+        <button class="btn btn-outline btn-sm js-go-grades" type="button">بازگشت به مقاطع تحصیلی</button>
+      </footer>
+    </main>
+
+    <!-- ۷. صفحه «درباره نرم‌افزار» -->
     <main id="about-view" class="hidden">
-     <section class="card info-card">
+      <section class="card info-card">
         <h2>درباره نرم‌افزار آموزشی «سالار»</h2>
         <p>
-          نرم‌افزار «سالار» یک برنامه آموزشی ساده، رایگان و قابل اجرا روی گوشی و کامپیوتر است که برای کمک به
-          دانش‌آموزان دوره ابتدایی در یادگیری <strong>املای درست کلمات</strong> و <strong>معنی لغات و اصطلاحات</strong> کتاب فارسی طراحی شده است.
+          نرم‌افزار «سالار» یک برنامه آموزشی ساده، رایگان و قابل اجرا روی گوشی، تبلت و کامپیوتر است که برای کمک به
+          دانش‌آموزان دوره ابتدایی (پایه‌های اول تا ششم) در یادگیری <strong>املای درست کلمات</strong>،
+          <strong>صداشناسی</strong> و <strong>معنی لغات و اصطلاحات</strong> کتاب فارسی طراحی شده است.
         </p>
         <ul class="info-list">
-          <li>پوشش درس‌به‌درس و آزمون جامع از همه درس‌های هر پایه.</li>
-          <li>جداسازی کامل بخش املا از بخش معنی لغات.</li>
+          <li>پوشش کامل و درس‌به‌درس کتاب‌های فارسی اول تا ششم دبستان به همراه آزمون جامع هر پایه.</li>
+          <li>جداسازی کامل بخش املا از بخش معنی لغات (و بخش صداشناسی و درک مطلب برای کلاس اول).</li>
+          <li>رعایت دقیق دایره‌ی حروف تدریس‌شده تا هر درس در پایه‌ی اول ابتدایی.</li>
           <li>ثبت خودکار پاسخ‌های نادرست برای مرور هدفمند اشتباهات.</li>
-          <li>ذخیره لحظه‌ای پیشرفت در دستگاه و قابلیت نصب و استفاده آفلاین.</li>
+          <li>امکان تغییر اندازه نوشته‌ها (بزرگ‌نمایی و کوچک‌نمایی)، نمایش تمام‌نما و تغییر تم روشن و تیره.</li>
+          <li>ذخیره لحظه‌ای پیشرفت در دستگاه و قابلیت نصب و استفاده کاملاً آفلاین.</li>
         </ul>
         <p class="developer-info">
           این نرم‌افزار توسط <strong>مهدی قربعلی پوردرو</strong> طراحی و ساخته شده است.<br>
           پروفایل گیت‌هاب:
-          <a href="https://github.com/ghorbalipour" target="_blank" rel="noopener noreferrer" dir="ltr">
+          <a href="https://github.com/ghorbalipour/" target="_blank" rel="noopener noreferrer" dir="ltr">
             github.com/ghorbalipour
           </a>
         </p>
@@ -199,14 +359,13 @@
       </footer>
     </main>
 
-    <!-- ۷. صفحه «نام‌گذاری نرم‌افزار» (با کادر اختصاصی عکس) -->
+    <!-- ۸. صفحه «نام‌گذاری نرم‌افزار» (با کادر اختصاصی عکس) -->
     <main id="naming-view" class="hidden">
       <section class="card naming-card">
         <div class="naming-photo-wrap">
           <figure class="naming-figure">
             <img src="images/naming.jpg" alt="شادروان مشهدی سالار ویسانیان" class="naming-photo">
           </figure>
-		  
         </div>
         <div class="naming-text">
           <h2>چرا نام این نرم‌افزار را «سالار» گذاشته‌ایم؟</h2>
@@ -250,7 +409,7 @@
   </div>
 
   <!-- پیام اطلاع‌رسانی کوتاه -->
-  <div id="toast" class="toast hidden"></div>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
   <script src="app.js"></script>
   <script>
