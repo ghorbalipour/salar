@@ -1,9 +1,9 @@
-const CACHE_NAME = "salar-pwa-v23";
+const CACHE_NAME = "salar-pwa-v25";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./style.css?v=2.13",
-  "./app.js?v=2.13",
+  "./style.css?v=2.15",
+  "./app.js?v=2.15",
   "./manifest.json",
   "./images/icon-192.png",
   "./images/icon-512.png",
@@ -15,12 +15,12 @@ const CORE_ASSETS = [
   "./images/salar_guidance.png",
   "./images/salar_praise.png",
   "./images/salar_thinking.png",
-  "./data/grade1.js?v=2.13",
-  "./data/grade2.js?v=2.13",
-  "./data/grade3.js?v=2.13",
-  "./data/grade4.js?v=2.13",
-  "./data/grade5.js?v=2.13",
-  "./data/grade6.js?v=2.13"
+  "./data/grade1.js?v=2.15",
+  "./data/grade2.js?v=2.15",
+  "./data/grade3.js?v=2.15",
+  "./data/grade4.js?v=2.15",
+  "./data/grade5.js?v=2.15",
+  "./data/grade6.js?v=2.15"
 ];
 
 self.addEventListener("install", (event) => {
@@ -55,6 +55,9 @@ self.addEventListener("message", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const reqUrl = new URL(event.request.url);
+
+  // درخواست‌های بیرونی (مثل آمارگیر Yandex Metrica) هرگز توسط Service Worker کش یا مسدود نمی‌شوند
+  if (reqUrl.origin !== self.location.origin) return;
 
   // فایل version.json همیشه مستقیم از شبکه خوانده می‌شود
   if (reqUrl.pathname.endsWith("/version.json")) {

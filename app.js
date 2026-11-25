@@ -2,13 +2,15 @@
   "use strict";
 
   // کلیدهای ذخیره‌سازی محلی (کاملاً مستقل از کش فایل‌های نرم‌افزار — در آپدیت‌ها حفظ می‌شوند)
-  const APP_VERSION = "2.13";
+  const APP_VERSION = "2.15";
+  const YM_TAG_ID = 114682416;
   const BACKUP_META_KEY = "salar_backup_meta_v1";
   const STORAGE_KEY = "farsi6_emla_app_v1";
   const CUSTOM_STORAGE_KEY = "salar_custom_content_v1";
   const THEME_KEY = "salar_theme_v1";
   const FONT_SCALE_KEY = "salar_font_scale_v3";
   const POST_UPDATE_KEY = "salar_post_update_v1";
+  const PWA_INSTALL_TRACKED_KEY = "salar_pwa_install_tracked_v1";
   const AUTO_NEXT_DELAY_MS = 1000;
 
   const MIN_FONT_SCALE = 0.7;
@@ -418,9 +420,110 @@
     refreshInstallCardUI();
   });
 
+  // --- آمارگیر سبک و آفلاین‌محور Yandex Metrica (شمارش دقیق نصب هر دستگاه یک‌بار + پایان آزمون) ---
+  let installGoalInFlight = false;
+
+  function detectAnalyticsPlatform() {
+    const ua = navigator.userAgent || "";
+    if (/iPad|iPhone|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+      return "ios";
+    }
+    if (/Android/i.test(ua)) return "android";
+    if (/Windows/i.test(ua)) return "windows";
+    return "desktop";
+  }
+
+  function ensureMetrikaLoaded() {
+    if (typeof window.__salarLoadMetrika === "function") {
+      try {
+        window.__salarLoadMetrika();
+      } catch {}
+    }
+  }
+
+  function trackMetrikaGoal(goalId, params, onSent) {
+    if (window.location.protocol === "file:") return false;
+    if (navigator.onLine === false) return false;
+    ensureMetrikaLoaded();
+    if (typeof window.ym !== "function") return false;
+    try {
+      if (typeof onSent === "function") {
+        window.ym(YM_TAG_ID, "reachGoal", goalId, params || {}, onSent);
+      } else {
+        window.ym(YM_TAG_ID, "reachGoal", goalId, params || {});
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function flushPendingInstallGoal() {
+    if (installGoalInFlight) return;
+    if (window.location.protocol === "file:" || navigator.onLine === false) return;
+
+    let raw = null;
+    try {
+      raw = localStorage.getItem(PWA_INSTALL_TRACKED_KEY);
+    } catch {
+      return;
+    }
+    if (!raw || raw === "sent") return;
+
+    let pendingInfo = { source: "standalone", platform: detectAnalyticsPlatform() };
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.status === "sent") return;
+      if (parsed && parsed.source) pendingInfo.source = parsed.source;
+      if (parsed && parsed.platform) pendingInfo.platform = parsed.platform;
+    } catch {}
+
+    installGoalInFlight = true;
+    const sent = trackMetrikaGoal(
+      "pwa_installed",
+      { platform: pendingInfo.platform, source: pendingInfo.source, version: APP_VERSION },
+      () => {
+        installGoalInFlight = false;
+        try {
+          localStorage.setItem(PWA_INSTALL_TRACKED_KEY, "sent");
+        } catch {}
+      }
+    );
+    if (!sent) {
+      installGoalInFlight = false;
+    }
+  }
+
+  function markPwaInstallDetected(source) {
+    try {
+      const existing = localStorage.getItem(PWA_INSTALL_TRACKED_KEY);
+      if (existing === "sent") return;
+      if (!existing) {
+        localStorage.setItem(
+          PWA_INSTALL_TRACKED_KEY,
+          JSON.stringify({
+            status: "pending",
+            source: source || "standalone",
+            platform: detectAnalyticsPlatform(),
+            at: Date.now()
+          })
+        );
+      }
+    } catch {
+      return;
+    }
+    flushPendingInstallGoal();
+  }
+
+  window.addEventListener("online", () => {
+    ensureMetrikaLoaded();
+    flushPendingInstallGoal();
+  });
+
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
     refreshInstallCardUI();
+    markPwaInstallDetected("appinstalled");
     showInstallActionStatus("ok", "✅ نرم‌افزار سالار با موفقیت روی دستگاه شما نصب شد و از این پس کاملاً آفلاین کار می‌کند!");
     showToast("نرم‌افزار سالار با موفقیت نصب شد!");
   });
@@ -1956,6 +2059,16 @@
       }
       el.resultSummary.textContent =
         `از ${toPersianDigits(total)} سؤال به ${toPersianDigits(ok)} سؤال درست پاسخ دادی. می‌توانی همین الان اشتباهاتت را دوباره تمرین کنی.`;
+    }
+
+    if (total > 0) {
+      trackMetrikaGoal("quiz_completed", {
+        grade: (s && s.gradeId) || (activeGrade && activeGrade.id) || "unknown",
+        mode: (s && s.mode) || "spelling",
+        reviewOnly: Boolean(s && s.reviewOnly),
+        total: total,
+        correct: ok
+      });
     }
 
     el.btnResultLesson.textContent =
@@ -3965,6 +4078,11 @@
   applyTheme(currentTheme);
   applyFontScale(currentFontScale, false, false);
   updateFullscreenButton();
+  if (isAppInstalledStandalone()) {
+    markPwaInstallDetected("standalone");
+  } else {
+    flushPendingInstallGoal();
+  }
 
   let postUpdateData = null;
   try {

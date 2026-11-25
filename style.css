@@ -769,6 +769,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .developer-info p {
@@ -779,6 +780,7 @@ body {
   color: var(--badge-blue-text);
   font-weight: 700;
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
 .developer-info a:hover {
