@@ -148,31 +148,25 @@ body {
 
 .navbar-top-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-/* برند در گوشه بالا و سمت راست: تصویر + سالار و زیرعنوان پایین‌تر با فونت کوچک‌تر */
+/* برند در گوشه بالا و سمت راست: تصویر + سالار هم‌تراز با نوار ابزار */
 .brand-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   background: transparent;
   border: none;
   color: var(--text);
   font-family: inherit;
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 2px 2px;
   text-align: right;
-}
-
-.brand-top {
-  display: flex;
-  align-items: center;
-  gap: 9px;
+  flex-shrink: 0;
 }
 
 .brand-logo {
@@ -190,16 +184,18 @@ body {
 }
 
 .brand-tagline {
+  margin: -2px 2px 0;
   font-size: 0.76rem;
   font-weight: 500;
   color: var(--muted);
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
-/* نوار ابزار کوچک (زوم، تمام‌نما، تم، دکمه منوی موبایل) */
+/* نوار ابزار کوچک (زوم، تمام‌نما، تم) در چپ‌ترین بخش ردیف اول */
 .toolbar-controls {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 6px;
 }
@@ -599,11 +595,31 @@ body {
 /* صفحه نصب آفلاین و به‌روزرسانی */
 .install-hero-card {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-color: var(--primary);
+}
+
+.install-hero-top {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+}
+
+.install-hero-text {
+  flex: 1;
+  min-width: 240px;
+}
+
+.install-hero-card .update-status-box {
+  margin-bottom: 0;
+}
+
+.install-box.install-box-highlight {
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--badge-blue-bg);
 }
 
 .install-hero-card h2 {
@@ -1156,73 +1172,77 @@ code {
   }
 
   .navbar-top-row {
-    align-items: flex-start;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+
+  .brand-btn {
+    gap: 7px;
   }
 
   .brand-logo {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
   }
 
   .brand-name {
-    font-size: 1.28rem;
+    font-size: 1.15rem;
   }
 
   .brand-tagline {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
+    margin-top: -1px;
   }
 
   .toolbar-controls {
-    width: 100%;
-    justify-content: space-between;
+    width: auto;
+    justify-content: flex-end;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .zoom-group .tool-btn {
+    padding: 5px 7px;
   }
 
   .tool-btn {
-    min-height: 42px;
-    padding: 8px 11px;
-    font-size: 0.88rem;
+    min-height: 34px;
+    padding: 5px 8px;
+    font-size: 0.8rem;
   }
 
-  .mobile-menu-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--badge-blue-bg);
-    color: var(--badge-blue-text);
-    border-color: transparent;
-  }
-
-  /* منوی جمع‌شونده، درشت و خوانا در موبایل */
+  /* منوی تب‌مانند کنار هم — همیشه باز و قابل مشاهده زیر زیرعنوان در موبایل */
   .nav-links {
-    display: none;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding-top: 10px;
-  }
-
-  .nav-links.mobile-open {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding-top: 7px;
   }
 
   .nav-btn {
-    width: 100%;
-    text-align: right;
-    font-size: 1rem;
-    padding: 12px 14px;
-    min-height: 48px;
-    border-radius: 10px;
+    width: auto;
+    text-align: center;
+    font-size: clamp(11.5px, 0.8rem, 14px);
+    padding: 6px 10px;
+    min-height: 34px;
+    border-radius: 9px 9px 4px 4px;
     border: 1px solid var(--border);
-    border-right: 4px solid transparent;
-    background: var(--surface);
+    border-bottom: 2.5px solid transparent;
+    background: var(--surface-subtle);
+    white-space: nowrap;
   }
 
   .nav-btn.active {
     border-color: var(--nav-accent);
-    border-right-width: 4px;
-    border-bottom-width: 1px;
+    border-bottom: 2.5px solid var(--nav-accent);
     background: var(--nav-active-bg);
     color: var(--nav-accent);
+    font-weight: 700;
   }
 
   .container {
@@ -2145,22 +2165,26 @@ button,
 
 @media (max-width: 680px) {
   .brand-name {
-    font-size: clamp(18px, 1.2rem, 23px);
+    font-size: clamp(16px, 1.12rem, 21px);
   }
 
   .brand-tagline {
-    font-size: clamp(11px, 0.74rem, 14px);
+    font-size: clamp(11px, 0.74rem, 13.5px);
   }
 
   .tool-btn {
-    min-height: 40px;
-    padding: 6px 10px;
-    font-size: clamp(13px, 0.84rem, 16px);
+    min-height: 34px;
+    padding: 5px 8px;
+    font-size: clamp(11.5px, 0.78rem, 14px);
+  }
+
+  .zoom-group .tool-btn {
+    padding: 5px 7px;
   }
 
   .tool-btn-pct {
-    min-width: 48px;
-    font-size: clamp(12px, 0.78rem, 15px);
+    min-width: 38px;
+    font-size: clamp(11px, 0.74rem, 13.5px);
   }
 }
 
@@ -2369,5 +2393,30 @@ button,
     width: 112px;
     height: 112px;
     border-radius: 18px;
+  }
+}
+
+/* ==========================================================================
+   نسخه ۲.۱۳: دکمه‌ی بازنشانی با تم قرمز ملایم و بهینه‌سازی نوار بالا
+   ========================================================================== */
+.btn-danger-soft {
+  background: var(--red-bg);
+  color: var(--red);
+  border-color: var(--red-border);
+}
+
+.btn-danger-soft:hover:not(:disabled) {
+  background: var(--red-bg);
+  border-color: var(--red);
+  filter: brightness(0.96);
+}
+
+.developer-link-row + .developer-link-row {
+  margin-top: 6px;
+}
+
+@media (max-width: 680px) {
+  .install-hero-top .btn {
+    width: 100%;
   }
 }

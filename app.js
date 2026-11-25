@@ -2,19 +2,19 @@
   "use strict";
 
   // کلیدهای ذخیره‌سازی محلی (کاملاً مستقل از کش فایل‌های نرم‌افزار — در آپدیت‌ها حفظ می‌شوند)
-  const APP_VERSION = "2.12";
+  const APP_VERSION = "2.13";
   const BACKUP_META_KEY = "salar_backup_meta_v1";
   const STORAGE_KEY = "farsi6_emla_app_v1";
   const CUSTOM_STORAGE_KEY = "salar_custom_content_v1";
   const THEME_KEY = "salar_theme_v1";
-  const FONT_SCALE_KEY = "salar_font_scale_v2";
+  const FONT_SCALE_KEY = "salar_font_scale_v3";
   const POST_UPDATE_KEY = "salar_post_update_v1";
   const AUTO_NEXT_DELAY_MS = 1000;
 
-  const MIN_FONT_SCALE = 0.8;
+  const MIN_FONT_SCALE = 0.7;
   const MAX_FONT_SCALE = 2.0;
   const FONT_SCALE_STEP = 0.1;
-  const MOBILE_DEFAULT_FONT_SCALE = 1.5;
+  const MOBILE_DEFAULT_FONT_SCALE = 0.8;
   const DESKTOP_DEFAULT_FONT_SCALE = 1.0;
 
   // فهرست ۶ پایه‌ی رسمی فارسی دبستان
@@ -84,7 +84,6 @@
     navBrand: document.getElementById("nav-brand"),
     navLinks: document.getElementById("nav-links"),
     navBtns: document.querySelectorAll(".nav-btn"),
-    btnMobileMenu: document.getElementById("btn-mobile-menu"),
     btnThemeToggle: document.getElementById("btn-theme-toggle"),
     btnFullscreen: document.getElementById("btn-fullscreen"),
     btnZoomIn: document.getElementById("btn-zoom-in"),
@@ -106,7 +105,12 @@
     namingView: document.getElementById("naming-view"),
 
     directInstallCard: document.getElementById("direct-install-card"),
+    installHeroDesc: document.getElementById("install-hero-desc"),
     btnPwaInstall: document.getElementById("btn-pwa-install"),
+    installActionStatus: document.getElementById("install-action-status"),
+    installBoxAndroid: document.getElementById("install-box-android"),
+    installBoxIos: document.getElementById("install-box-ios"),
+    installBoxWindows: document.getElementById("install-box-windows"),
     btnCheckUpdate: document.getElementById("btn-check-update"),
     appVersionLabel: document.getElementById("app-version-label"),
     updateStatusBox: document.getElementById("update-status-box"),
@@ -118,7 +122,6 @@
 
     gradesGrid: document.getElementById("grades-grid"),
     lessonsGrid: document.getElementById("lessons-grid"),
-    btnGradeResetAll: document.getElementById("btn-grade-reset-all"),
 
     modesGrid: document.getElementById("modes-grid"),
     btnResetLesson: document.getElementById("btn-reset-lesson"),
@@ -262,19 +265,7 @@
   }
 
   // --- مدیریت منوی موبایل ---
-  function closeMobileMenu() {
-    if (!el.navLinks || !el.btnMobileMenu) return;
-    el.navLinks.classList.remove("mobile-open");
-    el.btnMobileMenu.setAttribute("aria-expanded", "false");
-    el.btnMobileMenu.textContent = "☰ منو";
-  }
 
-  function toggleMobileMenu() {
-    if (!el.navLinks || !el.btnMobileMenu) return;
-    const isOpen = el.navLinks.classList.toggle("mobile-open");
-    el.btnMobileMenu.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    el.btnMobileMenu.textContent = isOpen ? "✕ بستن" : "☰ منو";
-  }
 
   // --- مدیریت زوم (پیش‌فرض ۱۰۰٪ در ویندوز/دسکتاپ و ۱۵۰٪ در اندروید و iOS، تا سقف ۲۰۰٪) ---
   function isMobileOS() {
@@ -382,28 +373,124 @@
   }
 
   // --- مدیریت نصب آفلاین (PWA) و بررسی نسخه جدید ---
+  function isAppInstalledStandalone() {
+    return Boolean(
+      (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+      window.navigator.standalone === true
+    );
+  }
+
+  function showInstallActionStatus(type, message) {
+    if (!el.installActionStatus) return;
+    el.installActionStatus.className = `update-status-box ${type}`;
+    el.installActionStatus.textContent = message;
+  }
+
+  function clearInstallHighlights() {
+    [el.installBoxAndroid, el.installBoxIos, el.installBoxWindows].forEach((box) => {
+      if (box) box.classList.remove("install-box-highlight");
+    });
+  }
+
+  function highlightInstallBox(box) {
+    clearInstallHighlights();
+    if (box) {
+      box.classList.add("install-box-highlight");
+      box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+
+  function refreshInstallCardUI() {
+    if (!el.btnPwaInstall) return;
+    if (isAppInstalledStandalone()) {
+      el.btnPwaInstall.textContent = "✅ برنامه نصب شده است";
+      el.btnPwaInstall.disabled = true;
+      showInstallActionStatus("ok", "✅ نرم‌افزار «سالار» همین حالا به صورت آفلاین روی دستگاه شما نصب است و بدون اینترنت کار می‌کند.");
+    } else {
+      el.btnPwaInstall.textContent = "📲 این برنامه را برایم آفلاین نصب کن";
+      el.btnPwaInstall.disabled = false;
+    }
+  }
+
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    if (el.directInstallCard) el.directInstallCard.classList.remove("hidden");
+    refreshInstallCardUI();
   });
 
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
-    if (el.directInstallCard) el.directInstallCard.classList.add("hidden");
+    refreshInstallCardUI();
+    showInstallActionStatus("ok", "✅ نرم‌افزار سالار با موفقیت روی دستگاه شما نصب شد و از این پس کاملاً آفلاین کار می‌کند!");
     showToast("نرم‌افزار سالار با موفقیت نصب شد!");
   });
 
-  function triggerPwaInstall() {
-    if (!deferredInstallPrompt) {
-      showToast("از راهنمای زیر برای نصب از منوی مرورگر استفاده کنید.");
+  async function triggerPwaInstall() {
+    if (window.location.protocol === "file:") {
+      showInstallActionStatus("warn", "⚠️ برای نصب آفلاین باید نرم‌افزار را از طریق آدرس اینترنتی سایت باز کنید (نه فایل مستقیم).");
       return;
     }
-    deferredInstallPrompt.prompt();
-    deferredInstallPrompt.userChoice.then(() => {
-      deferredInstallPrompt = null;
-      if (el.directInstallCard) el.directInstallCard.classList.add("hidden");
-    }).catch(() => {});
+
+    if (isAppInstalledStandalone()) {
+      refreshInstallCardUI();
+      return;
+    }
+
+    // ۱. اگر مرورگر اجازه‌ی نصب خودکار یک‌کلیکی را داده باشد (کروم و اج اندروید و ویندوز)
+    if (deferredInstallPrompt) {
+      try {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice && choice.outcome === "accepted") {
+          showInstallActionStatus("ok", "✅ درخواست نصب تأیید شد! تا چند لحظه‌ی دیگر آیکون «سالار» به دستگاه شما اضافه می‌شود.");
+        } else {
+          showInstallActionStatus("info", "نصب لغو شد. هر زمان خواستید می‌توانید دوباره روی همین دکمه بزنید.");
+        }
+        deferredInstallPrompt = null;
+      } catch {
+        showInstallActionStatus("info", "از راهنمای پایین صفحه برای تکمیل نصب از منوی مرورگر استفاده کنید.");
+      }
+      return;
+    }
+
+    // ۲. تشخیص دقیق دستگاه و مرورگر و راهنمایی فوری
+    const ua = navigator.userAgent || "";
+    const isIOS = /iPad|iPhone|iPod/i.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+    const isInAppBrowser = /Telegram|Instagram|FBAN|FBAV|WhatsApp|Eitaa|Shad|Rubika|Bale|;\s*wv/i.test(ua);
+
+    if (isInAppBrowser) {
+      showInstallActionStatus(
+        "warn",
+        "⚠️ شما سایت را داخل مرورگر داخلی پیام‌رسان باز کرده‌اید که اجازه‌ی نصب آفلاین نمی‌دهد. لطفاً از منوی بالا گزینه‌ی «باز کردن در مرورگر / Open in Chrome» را بزنید و سپس روی همین دکمه کلیک کنید."
+      );
+      return;
+    }
+
+    if (isIOS) {
+      showInstallActionStatus(
+        "info",
+        "🍎 در آیفون و آیپد، سیستم‌عامل اپل اجازه‌ی نصب خودکار بدون دکمه‌ی اشتراک‌گذاری را به سایت‌ها نمی‌دهد. کافی است پایین مرورگر سافاری روی دکمه‌ی اشتراک‌گذاری (مربع با فلش بالا) بزنید و «Add to Home Screen» و سپس «Add» را انتخاب کنید."
+      );
+      highlightInstallBox(el.installBoxIos);
+      return;
+    }
+
+    if (isAndroid) {
+      showInstallActionStatus(
+        "info",
+        "🤖 اگر برنامه هنوز روی گوشی شما نصب نشده، در مرورگر گوگل کروم روی سه‌نقطه‌ی بالا (⋮) بزنید و گزینه‌ی «نصب برنامه / Install app» را انتخاب کنید. (اگر قبلاً نصب کرده‌اید، آیکون سالار در صفحه‌ی برنامه‌های گوشی شما آماده است.)"
+      );
+      highlightInstallBox(el.installBoxAndroid);
+      return;
+    }
+
+    showInstallActionStatus(
+      "info",
+      "💻 در مرورگر Chrome یا Edge ویندوز، روی آیکون نصب (مانیتور با فلش پایین) در سمت راست نوار آدرس بالا کلیک کنید و «Install» را بزنید. (اگر آن آیکون دیده نمی‌شود، احتمالاً برنامه قبلاً روی ویندوز نصب شده است.)"
+    );
+    highlightInstallBox(el.installBoxWindows);
   }
 
   function showUpdateStatus(type, message) {
@@ -1236,7 +1323,6 @@
   }
 
   function showView(viewName) {
-    closeMobileMenu();
     currentViewName = viewName;
 
     // هنگام ورود دانش‌آموز به مقطع/درس/آزمون، بنر پنهان می‌شود تا تمرکز حفظ شود؛ در بازگشت به مقاطع دوباره نمایش می‌یابد
@@ -1286,71 +1372,7 @@
       null
     );
 
-    const sessions = getValidActiveSessions();
-    if (sessions.length > 0 && el.resumeList) {
-      if (el.resumeBadge) {
-        el.resumeBadge.textContent = sessions.length > 1
-          ? `آزمون‌های نیمه‌کاره (${toPersianDigits(sessions.length)})`
-          : "آزمون نیمه‌کاره";
-      }
-      if (el.resumeSubtitle) {
-        el.resumeSubtitle.textContent = sessions.length > 1
-          ? "می‌توانی هر یک از تمرین‌های ناتمامت را از همان‌جا ادامه دهی:"
-          : "یک تمرین ناتمام داری؛ می‌توانی از همان‌جا ادامه دهی:";
-      }
 
-      el.resumeList.innerHTML = "";
-      sessions.forEach((s) => {
-        const gradeId = s.gradeId || "grade6";
-        const gradeObj = GRADES.find((g) => g.id === gradeId);
-        const gradeName = gradeObj ? gradeObj.shortTitle : "فارسی ششم";
-        const secMeta = getSectionMeta(gradeId, s.mode || "spelling");
-        const reviewTag = s.reviewOnly ? " (مرور اشتباهات)" : "";
-        const lessonPart = s.lessonLabel
-          ? ` — ${s.lessonLabel}`
-          : (s.lessonScope === "all" ? " — همه درس‌ها" : "");
-
-        const row = document.createElement("div");
-        row.className = "resume-row";
-
-        const info = document.createElement("div");
-        info.className = "resume-row-info";
-        info.innerHTML = `
-          <span class="resume-row-title">${escapeHtml(gradeName)}${escapeHtml(lessonPart)}</span>
-          <span class="resume-row-meta">${escapeHtml(secMeta.title)}${reviewTag} • سؤال ${toPersianDigits(s.currentIndex + 1)} از ${toPersianDigits(s.queue.length)}</span>
-        `;
-
-        const actions = document.createElement("div");
-        actions.className = "resume-actions";
-
-        const btnContinue = document.createElement("button");
-        btnContinue.type = "button";
-        btnContinue.className = "btn btn-primary btn-sm";
-        btnContinue.textContent = "ادامه از همین‌جا";
-        btnContinue.addEventListener("click", () => resumeSession(s.id));
-
-        const btnDiscard = document.createElement("button");
-        btnDiscard.type = "button";
-        btnDiscard.className = "btn btn-ghost btn-sm";
-        btnDiscard.textContent = "بستن";
-        btnDiscard.addEventListener("click", () => {
-          removeActiveSession(s.id);
-          saveState();
-          renderGrades();
-        });
-
-        actions.appendChild(btnContinue);
-        actions.appendChild(btnDiscard);
-        row.appendChild(info);
-        row.appendChild(actions);
-        el.resumeList.appendChild(row);
-      });
-
-      el.resumeCard.classList.remove("hidden");
-    } else {
-      if (el.resumeList) el.resumeList.innerHTML = "";
-      el.resumeCard.classList.add("hidden");
-    }
 
     el.gradesGrid.innerHTML = "";
     GRADES.forEach((grade) => {
@@ -1403,6 +1425,73 @@
       });
   }
 
+  function renderGradeResumeCard() {
+    if (!el.resumeCard || !el.resumeList || !activeGrade) return;
+    const sessions = getValidActiveSessions().filter(
+      (s) => (s.gradeId || "grade6") === activeGrade.id
+    );
+
+    if (sessions.length > 0) {
+      if (el.resumeBadge) {
+        el.resumeBadge.textContent = sessions.length > 1
+          ? `آزمون‌های نیمه‌کاره (${toPersianDigits(sessions.length)})`
+          : "آزمون نیمه‌کاره";
+      }
+      if (el.resumeSubtitle) {
+        el.resumeSubtitle.textContent = sessions.length > 1
+          ? `تمرین‌های ناتمام ${activeGrade.shortTitle} را می‌توانی از همان‌جا ادامه دهی:`
+          : `یک تمرین ناتمام در ${activeGrade.shortTitle} داری؛ می‌توانی از همان‌جا ادامه دهی:`;
+      }
+
+      el.resumeList.innerHTML = "";
+      sessions.forEach((s) => {
+        const secMeta = getSectionMeta(activeGrade.id, s.mode || "spelling");
+        const reviewTag = s.reviewOnly ? " (مرور اشتباهات)" : "";
+        const lessonTitle = s.lessonLabel || getScopeLabel(s.lessonScope);
+
+        const row = document.createElement("div");
+        row.className = "resume-row";
+
+        const info = document.createElement("div");
+        info.className = "resume-row-info";
+        info.innerHTML = `
+          <span class="resume-row-title">${escapeHtml(lessonTitle)}</span>
+          <span class="resume-row-meta">${escapeHtml(secMeta.title)}${reviewTag} • سؤال ${toPersianDigits(s.currentIndex + 1)} از ${toPersianDigits(s.queue.length)}</span>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "resume-actions";
+
+        const btnContinue = document.createElement("button");
+        btnContinue.type = "button";
+        btnContinue.className = "btn btn-primary btn-sm";
+        btnContinue.textContent = "ادامه از همین‌جا";
+        btnContinue.addEventListener("click", () => resumeSession(s.id));
+
+        const btnDiscard = document.createElement("button");
+        btnDiscard.type = "button";
+        btnDiscard.className = "btn btn-ghost btn-sm";
+        btnDiscard.textContent = "بستن";
+        btnDiscard.addEventListener("click", () => {
+          removeActiveSession(s.id);
+          saveState();
+          renderGradeHome();
+        });
+
+        actions.appendChild(btnContinue);
+        actions.appendChild(btnDiscard);
+        row.appendChild(info);
+        row.appendChild(actions);
+        el.resumeList.appendChild(row);
+      });
+
+      el.resumeCard.classList.remove("hidden");
+    } else {
+      el.resumeList.innerHTML = "";
+      el.resumeCard.classList.add("hidden");
+    }
+  }
+
   function renderGradeHome() {
     clearAutoNext();
     refreshActiveGradeMergedData();
@@ -1410,9 +1499,11 @@
     configureHeader(
       `تمرین املا و لغت ${activeGrade.shortTitle}`,
       `${activeGrade.shortTitle} — سالار`,
-      "تغییر مقطع",
-      renderGrades
+      null,
+      null
     );
+
+    renderGradeResumeCard();
 
     el.lessonsGrid.innerHTML = "";
 
@@ -1438,7 +1529,19 @@
       <span class="${allPillClass}">${allPillText}</span>
     `;
     btnAllMain.addEventListener("click", () => openLesson("all"));
+
+    const btnAllReset = document.createElement("button");
+    btnAllReset.type = "button";
+    btnAllReset.className = "lesson-reset-btn";
+    btnAllReset.title = `بازنشانی همه درس‌های ${activeGrade.title}`;
+    btnAllReset.textContent = "بازنشانی";
+    btnAllReset.addEventListener("click", (e) => {
+      e.stopPropagation();
+      resetCurrentGrade(true);
+    });
+
     allItem.appendChild(btnAllMain);
+    allItem.appendChild(btnAllReset);
     el.lessonsGrid.appendChild(allItem);
 
     currentLessons.forEach((lesson) => {
@@ -3625,6 +3728,12 @@
     if (el.appVersionLabel) {
       el.appVersionLabel.textContent = toPersianDigits(APP_VERSION);
     }
+    clearInstallHighlights();
+    if (el.installActionStatus && !isAppInstalledStandalone()) {
+      el.installActionStatus.className = "update-status-box hidden";
+      el.installActionStatus.textContent = "";
+    }
+    refreshInstallCardUI();
     if (!keepStatus && el.updateStatusBox) {
       el.updateStatusBox.className = "update-status-box hidden";
       el.updateStatusBox.textContent = "";
@@ -3678,7 +3787,7 @@
 
   function resetCurrentGrade(stayOnGradeHome) {
     if (!activeGrade) return;
-    if (!confirm(`آیا مطمئن هستید پیشرفت همه درس‌های «${activeGrade.shortTitle}» پاک شود؟ (سؤال‌های شخصی حذف نمی‌شوند)`)) return;
+    if (!confirm(`هشدار: همه‌ی درس‌های «${activeGrade.title}» (${activeGrade.shortTitle}) بازنشانی می‌شوند و تمام اطلاعات پیشرفت و امتیازهای این پایه حذف خواهند شد. (سؤال‌های شخصی حذف نمی‌شوند)\n\nآیا از بازنشانی مطمئن هستید؟`)) return;
 
     currentLessons.forEach((lesson) => {
       Object.keys(lesson.sections).forEach((secId) => {
@@ -3699,7 +3808,6 @@
 
   // --- رویدادها ---
   el.navBrand.addEventListener("click", renderGrades);
-  if (el.btnMobileMenu) el.btnMobileMenu.addEventListener("click", toggleMobileMenu);
 
   el.navBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -3748,7 +3856,6 @@
     startQuiz(lastFinishedSession.mode, true);
   });
 
-  el.btnGradeResetAll.addEventListener("click", () => resetCurrentGrade(true));
   el.btnResetLesson.addEventListener("click", () => resetLessonById(selectedLesson, false));
   el.btnResetAll.addEventListener("click", () => resetCurrentGrade(false));
 

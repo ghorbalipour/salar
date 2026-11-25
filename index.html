@@ -34,7 +34,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="images/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css?v=2.12">
+  <link rel="stylesheet" href="style.css?v=2.13">
 
   <!-- داده‌های ساختاریافته (Schema.org) برای نمایش بهتر در نتایج گوگل -->
   <script type="application/ld+json">
@@ -68,32 +68,30 @@
   <!-- منوی ثابت بالای همه صفحات -->
   <nav class="navbar" aria-label="منوی اصلی">
     <div class="navbar-inner">
+      <!-- ردیف اول: نماد و نام «سالار» در سمت راست و ابزارهای زوم، تمام‌نما و تم در چپ‌ترین بخش -->
       <div class="navbar-top-row">
-        <!-- گوشه بالا و سمت راست: تصویر + سالار و زیرعنوان با فونت کوچک‌تر -->
         <button id="nav-brand" class="brand-btn" type="button" title="صفحه انتخاب مقاطع">
-          <span class="brand-top">
-            <img src="images/icon-192.png" alt="لوگوی نرم‌افزار سالار" class="brand-logo">
-            <span class="brand-name">سالار</span>
-          </span>
-          <span class="brand-tagline">نرم‌افزار تعاملی املا و لغت فارسی دبستان</span>
+          <img src="images/icon-192.png" alt="لوگوی نرم‌افزار سالار" class="brand-logo">
+          <span class="brand-name">سالار</span>
         </button>
 
-        <!-- دکمه‌های کاربردی سریع (زوم، تمام‌نما، تم، منوی موبایل) -->
         <div class="toolbar-controls">
           <div class="zoom-group" role="group" aria-label="تنظیم اندازه متن">
             <button id="btn-zoom-in" class="tool-btn" type="button" title="بزرگ‌تر کردن متن" aria-label="بزرگ‌تر کردن متن">آ+</button>
-            <button id="btn-zoom-reset" class="tool-btn tool-btn-pct" type="button" title="بازگرداندن اندازه متن به حالت عادی">۱۰۰٪</button>
+            <button id="btn-zoom-reset" class="tool-btn tool-btn-pct" type="button" title="بازگرداندن اندازه متن به حالت پیش‌فرض">۱۰۰٪</button>
             <button id="btn-zoom-out" class="tool-btn" type="button" title="کوچک‌تر کردن متن" aria-label="کوچک‌تر کردن متن">آ-</button>
           </div>
 
           <button id="btn-fullscreen" class="tool-btn hidden" type="button" title="نمایش تمام‌نما" aria-label="نمایش تمام‌نما">⛶ تمام‌نما</button>
           <button id="btn-theme-toggle" class="tool-btn" type="button" title="تغییر تم روشن و تیره">☀️ روشن</button>
-          <button id="btn-mobile-menu" class="tool-btn mobile-menu-btn" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="باز کردن منو">☰ منو</button>
         </div>
       </div>
 
-      <!-- لینک‌های ناوبری -->
-      <div id="nav-links" class="nav-links">
+      <!-- زیرعنوان نرم‌افزار -->
+      <p class="brand-tagline">نرم‌افزار تعاملی املا و لغت فارسی دبستان</p>
+
+      <!-- تب‌های منوی اصلی — همیشه قابل مشاهده کنار هم در موبایل و ویندوز -->
+      <div id="nav-links" class="nav-links" role="tablist" aria-label="منوی بخش‌های نرم‌افزار">
         <button class="nav-btn active" data-nav="grades" type="button">مقاطع تحصیلی</button>
         <button class="nav-btn" data-nav="builder" type="button">طراحی سؤال</button>
         <button class="nav-btn" data-nav="install" type="button">نصب آفلاین</button>
@@ -124,20 +122,6 @@
 
     <!-- ۱. صفحه انتخاب مقطع (اول تا ششم ابتدایی) -->
     <main id="grades-view">
-      <!-- کارت فهرست آزمون‌های نیمه‌کاره در همه‌ی مقاطع -->
-      <section id="resume-card" class="card resume-card hidden" aria-label="آزمون‌های نیمه‌کاره">
-        <div class="resume-card-header">
-          <div class="salar-sticker-frame salar-sticker-sm">
-            <img src="images/salar_thinking.png" alt="با هم یاد می‌گیریم" class="salar-sticker-img" width="192" height="192" decoding="async">
-          </div>
-          <div class="resume-header-text">
-            <span id="resume-badge" class="badge badge-warn">آزمون نیمه‌کاره</span>
-            <p id="resume-subtitle" class="text-muted resume-subtitle">می‌توانی هر یک از تمرین‌های ناتمامت را از همان‌جا ادامه دهی:</p>
-          </div>
-        </div>
-        <div id="resume-list" class="resume-list"></div>
-      </section>
-
       <p class="section-subtitle">لطفاً پایه تحصیلی دانش‌آموز را انتخاب کنید:</p>
       <section id="grades-grid" class="grades-grid" aria-label="پایه‌های اول تا ششم ابتدایی"></section>
 
@@ -155,12 +139,21 @@
 
     <!-- ۲. صفحه فهرست درس‌های مقطع انتخاب‌شده -->
     <main id="grade-home-view" class="hidden">
-      <section id="lessons-grid" class="lessons-grid"></section>
+      <!-- کارت فهرست آزمون‌های نیمه‌کاره اختصاصی همین مقطع -->
+      <section id="resume-card" class="card resume-card hidden" aria-label="آزمون‌های نیمه‌کاره این مقطع">
+        <div class="resume-card-header">
+          <div class="salar-sticker-frame salar-sticker-sm">
+            <img src="images/salar_thinking.png" alt="با هم یاد می‌گیریم" class="salar-sticker-img" width="192" height="192" decoding="async">
+          </div>
+          <div class="resume-header-text">
+            <span id="resume-badge" class="badge badge-warn">آزمون نیمه‌کاره</span>
+            <p id="resume-subtitle" class="text-muted resume-subtitle">می‌توانی هر یک از تمرین‌های ناتمام این پایه را از همان‌جا ادامه دهی:</p>
+          </div>
+        </div>
+        <div id="resume-list" class="resume-list"></div>
+      </section>
 
-      <footer class="page-bottom-bar">
-        <button class="btn btn-outline btn-sm js-go-grades" type="button">تغییر مقطع تحصیلی</button>
-        <button id="btn-grade-reset-all" class="btn btn-danger-outline btn-sm" type="button">بازنشانی همه درس‌های این پایه</button>
-      </footer>
+      <section id="lessons-grid" class="lessons-grid"></section>
     </main>
 
     <!-- ۳. صفحه داخلی هر درس (یا همه درس‌های یک پایه — کارت‌های بخش‌ها به صورت پویا ساخته می‌شوند) -->
@@ -170,8 +163,8 @@
       <footer class="page-bottom-bar">
         <button class="btn btn-outline btn-sm js-go-grade-home" type="button">بازگشت به فهرست درس‌ها</button>
         <div class="bottom-bar-actions">
-          <button id="btn-reset-lesson" class="btn btn-ghost btn-sm text-red" type="button">بازنشانی این درس</button>
-          <button id="btn-reset-all" class="btn btn-ghost btn-sm text-red hidden" type="button">بازنشانی همه درس‌های این پایه</button>
+          <button id="btn-reset-lesson" class="btn btn-danger-soft btn-sm" type="button">بازنشانی این درس</button>
+          <button id="btn-reset-all" class="btn btn-danger-soft btn-sm hidden" type="button">بازنشانی همه درس‌های این پایه</button>
         </div>
       </footer>
     </main>
@@ -526,14 +519,17 @@
 
     <!-- ۷. صفحه «نحوه نصب آفلاین و به‌روزرسانی» -->
     <main id="install-view" class="hidden">
-      <!-- کارت نصب مستقیم (در کروم و اج اندروید و ویندوز فعال می‌شود) -->
-      <section id="direct-install-card" class="card install-hero-card hidden">
-        <div>
-          <span class="badge badge-teal">نصب سریع و خودکار</span>
-          <h2>نصب مستقیم نرم‌افزار سالار روی این دستگاه</h2>
-          <p>مرورگر شما از نصب مستقیم پشتیبانی می‌کند. با زدن دکمه‌ی زیر، آیکون «سالار» روی دستگاه شما اضافه می‌شود و بدون اینترنت کار می‌کند.</p>
+      <!-- کارت نصب مستقیم و هوشمند آفلاین (همیشه قابل مشاهده) -->
+      <section id="direct-install-card" class="card install-hero-card">
+        <div class="install-hero-top">
+          <div class="install-hero-text">
+            <span class="badge badge-teal">نصب سریع و خودکار</span>
+            <h2>نصب آفلاین نرم‌افزار سالار روی این دستگاه</h2>
+            <p id="install-hero-desc">با زدن دکمه‌ی زیر، نرم‌افزار «سالار» به صورت خودکار روی گوشی یا کامپیوتر شما نصب می‌شود تا بدون نیاز به اینترنت اجرا شود.</p>
+          </div>
+          <button id="btn-pwa-install" class="btn btn-primary" type="button">📲 این برنامه را برایم آفلاین نصب کن</button>
         </div>
-        <button id="btn-pwa-install" class="btn btn-primary" type="button">📲 نصب نرم‌افزار سالار</button>
+        <div id="install-action-status" class="update-status-box hidden" role="status" aria-live="polite"></div>
       </section>
 
       <section class="card info-card">
@@ -545,7 +541,7 @@
         </p>
 
         <div class="install-grid">
-          <article class="install-box">
+          <article id="install-box-android" class="install-box">
             <h3>🤖 نصب روی گوشی و تبلت اندروید</h3>
             <ol class="install-steps">
               <li>سایت سالار را با مرورگر <strong>گوگل کروم (Chrome)</strong> باز کنید.</li>
@@ -555,7 +551,7 @@
             </ol>
           </article>
 
-          <article class="install-box">
+          <article id="install-box-ios" class="install-box">
             <h3>🍎 نصب روی آیفون و آیپد (iOS)</h3>
             <ol class="install-steps">
               <li>سایت سالار را حتماً با مرورگر <strong>سافاری (Safari)</strong> باز کنید.</li>
@@ -565,7 +561,7 @@
             </ol>
           </article>
 
-          <article class="install-box">
+          <article id="install-box-windows" class="install-box">
             <h3>💻 نصب روی کامپیوتر و لپ‌تاپ ویندوز</h3>
             <ol class="install-steps">
               <li>سایت سالار را در مرورگر <strong>Chrome</strong> یا <strong>Microsoft Edge</strong> باز کنید.</li>
@@ -581,7 +577,7 @@
         <div class="update-header">
           <div>
             <h2>🔄 نحوه دریافت نسخه‌ی جدیدتر (به‌روزرسانی)</h2>
-            <p class="text-muted">نسخه‌ی فعلی نصب‌شده روی دستگاه شما: <strong id="app-version-label">۲.۱۲</strong></p>
+            <p class="text-muted">نسخه‌ی فعلی نصب‌شده روی دستگاه شما: <strong id="app-version-label">۲.۱۳</strong></p>
           </div>
           <button id="btn-check-update" class="btn btn-primary" type="button">بررسی و دریافت نسخه جدید</button>
         </div>
@@ -640,6 +636,12 @@
               پروفایل گیت‌هاب:
               <a href="https://github.com/ghorbalipour/" target="_blank" rel="noopener noreferrer" dir="ltr">
                 github.com/ghorbalipour
+              </a>
+            </p>
+            <p class="developer-link-row">
+              صفحه نرم‌افزار در گیت‌هاب:
+              <a href="https://github.com/ghorbalipour/salar" target="_blank" rel="noopener noreferrer" dir="ltr">
+                github.com/ghorbalipour/salar
               </a>
             </p>
           </div>
@@ -703,7 +705,7 @@
   <!-- پیام اطلاع‌رسانی کوتاه -->
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=2.12"></script>
+  <script src="app.js?v=2.13"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

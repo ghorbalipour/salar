@@ -1,9 +1,9 @@
-const CACHE_NAME = "salar-pwa-v22";
+const CACHE_NAME = "salar-pwa-v23";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./style.css?v=2.12",
-  "./app.js?v=2.12",
+  "./style.css?v=2.13",
+  "./app.js?v=2.13",
   "./manifest.json",
   "./images/icon-192.png",
   "./images/icon-512.png",
@@ -15,12 +15,12 @@ const CORE_ASSETS = [
   "./images/salar_guidance.png",
   "./images/salar_praise.png",
   "./images/salar_thinking.png",
-  "./data/grade1.js?v=2.12",
-  "./data/grade2.js?v=2.12",
-  "./data/grade3.js?v=2.12",
-  "./data/grade4.js?v=2.12",
-  "./data/grade5.js?v=2.12",
-  "./data/grade6.js?v=2.12"
+  "./data/grade1.js?v=2.13",
+  "./data/grade2.js?v=2.13",
+  "./data/grade3.js?v=2.13",
+  "./data/grade4.js?v=2.13",
+  "./data/grade5.js?v=2.13",
+  "./data/grade6.js?v=2.13"
 ];
 
 self.addEventListener("install", (event) => {
