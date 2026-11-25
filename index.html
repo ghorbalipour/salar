@@ -34,7 +34,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="images/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css?v=2.8">
+  <link rel="stylesheet" href="style.css?v=2.12">
 
   <!-- داده‌های ساختاریافته (Schema.org) برای نمایش بهتر در نتایج گوگل -->
   <script type="application/ld+json">
@@ -104,6 +104,18 @@
   </nav>
 
   <div class="container">
+    <!-- بنر سراسری نرم‌افزار «سالار» — قابل مشاهده در تمامی صفحات -->
+    <div id="site-banner-wrap" class="site-banner-wrap">
+      <img
+        src="images/salar_banner.webp"
+        alt="با سالار، همیشه یاد می‌گیریم!"
+        class="site-banner-img"
+        width="1200"
+        height="387"
+        decoding="async"
+      >
+    </div>
+
     <!-- نوار عنوان صفحه فعلی -->
     <header class="page-header">
       <h1 id="page-title">انتخاب مقطع تحصیلی</h1>
@@ -112,16 +124,18 @@
 
     <!-- ۱. صفحه انتخاب مقطع (اول تا ششم ابتدایی) -->
     <main id="grades-view">
-      <!-- کارت ادامه آزمون نیمه‌کاره -->
-      <section id="resume-card" class="card resume-card hidden">
-        <div class="resume-info">
-          <span class="badge badge-warn">آزمون نیمه‌کاره</span>
-          <p id="resume-text"></p>
+      <!-- کارت فهرست آزمون‌های نیمه‌کاره در همه‌ی مقاطع -->
+      <section id="resume-card" class="card resume-card hidden" aria-label="آزمون‌های نیمه‌کاره">
+        <div class="resume-card-header">
+          <div class="salar-sticker-frame salar-sticker-sm">
+            <img src="images/salar_thinking.png" alt="با هم یاد می‌گیریم" class="salar-sticker-img" width="192" height="192" decoding="async">
+          </div>
+          <div class="resume-header-text">
+            <span id="resume-badge" class="badge badge-warn">آزمون نیمه‌کاره</span>
+            <p id="resume-subtitle" class="text-muted resume-subtitle">می‌توانی هر یک از تمرین‌های ناتمامت را از همان‌جا ادامه دهی:</p>
+          </div>
         </div>
-        <div class="resume-actions">
-          <button id="btn-resume" class="btn btn-primary" type="button">ادامه از همین‌جا</button>
-          <button id="btn-discard-session" class="btn btn-ghost btn-sm" type="button">بستن</button>
-        </div>
+        <div id="resume-list" class="resume-list"></div>
       </section>
 
       <p class="section-subtitle">لطفاً پایه تحصیلی دانش‌آموز را انتخاب کنید:</p>
@@ -181,11 +195,25 @@
         <p id="question-prompt" class="question-prompt"></p>
         <div id="options-container" class="options-grid"></div>
         <div id="feedback-box" class="feedback-box hidden">
-          <strong id="feedback-status"></strong>
-          <span id="feedback-hint"></span>
+          <div class="feedback-main">
+            <div class="salar-sticker-frame salar-sticker-md">
+              <img src="images/salar_guidance.png" alt="یک بار دیگر با دقت نگاه کن" class="salar-sticker-img" width="192" height="192" decoding="async">
+            </div>
+            <div class="feedback-body">
+              <strong id="feedback-status"></strong>
+              <span id="feedback-hint"></span>
+            </div>
+          </div>
+          <div class="feedback-action">
+            <button id="btn-next" class="btn btn-primary hidden" type="button">سؤال بعدی</button>
+          </div>
         </div>
-        <div class="quiz-footer">
-          <button id="btn-next" class="btn btn-primary hidden" type="button">سؤال بعدی</button>
+
+        <!-- نمایش کوتاه تصویر تشویقی سالار به مدت ۱ ثانیه پس از پاسخ درست -->
+        <div id="quiz-praise-overlay" class="quiz-praise-overlay hidden" aria-hidden="true">
+          <div class="salar-sticker-frame salar-sticker-praise">
+            <img src="images/salar_praise.png" alt="آفرین! عالی نوشتی!" class="salar-sticker-img" width="192" height="192" decoding="async">
+          </div>
         </div>
       </section>
 
@@ -197,6 +225,9 @@
     <!-- ۵. صفحه پایان آزمون -->
     <main id="result-view" class="hidden">
       <section class="card result-card">
+        <div id="result-sticker-wrap" class="salar-sticker-frame salar-sticker-lg result-sticker-wrap">
+          <img id="result-sticker" src="images/salar_congratulations.png" alt="نتیجه تمرین" class="salar-sticker-img" width="192" height="192" decoding="async">
+        </div>
         <h2>پایان تمرین</h2>
         <p id="result-summary" class="result-summary"></p>
         <div class="result-stats">
@@ -550,7 +581,7 @@
         <div class="update-header">
           <div>
             <h2>🔄 نحوه دریافت نسخه‌ی جدیدتر (به‌روزرسانی)</h2>
-            <p class="text-muted">نسخه‌ی فعلی نصب‌شده روی دستگاه شما: <strong id="app-version-label">۲.۸</strong></p>
+            <p class="text-muted">نسخه‌ی فعلی نصب‌شده روی دستگاه شما: <strong id="app-version-label">۲.۱۲</strong></p>
           </div>
           <button id="btn-check-update" class="btn btn-primary" type="button">بررسی و دریافت نسخه جدید</button>
         </div>
@@ -672,7 +703,7 @@
   <!-- پیام اطلاع‌رسانی کوتاه -->
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=2.8"></script>
+  <script src="app.js?v=2.12"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

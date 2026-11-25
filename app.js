@@ -2,14 +2,14 @@
   "use strict";
 
   // کلیدهای ذخیره‌سازی محلی (کاملاً مستقل از کش فایل‌های نرم‌افزار — در آپدیت‌ها حفظ می‌شوند)
-  const APP_VERSION = "2.8";
+  const APP_VERSION = "2.12";
   const BACKUP_META_KEY = "salar_backup_meta_v1";
   const STORAGE_KEY = "farsi6_emla_app_v1";
   const CUSTOM_STORAGE_KEY = "salar_custom_content_v1";
   const THEME_KEY = "salar_theme_v1";
   const FONT_SCALE_KEY = "salar_font_scale_v2";
   const POST_UPDATE_KEY = "salar_post_update_v1";
-  const AUTO_NEXT_DELAY_MS = 500;
+  const AUTO_NEXT_DELAY_MS = 1000;
 
   const MIN_FONT_SCALE = 0.8;
   const MAX_FONT_SCALE = 2.0;
@@ -57,6 +57,7 @@
   let questionMap = new Map();
   let currentQuestionIndex = 0;
   let isAnswered = false;
+  let currentSessionId = null;
   let lastFinishedSession = null;
   let toastTimer = null;
   let autoNextTimer = null;
@@ -90,6 +91,7 @@
     btnZoomOut: document.getElementById("btn-zoom-out"),
     btnZoomReset: document.getElementById("btn-zoom-reset"),
 
+    siteBannerWrap: document.getElementById("site-banner-wrap"),
     pageTitle: document.getElementById("page-title"),
     btnTopBack: document.getElementById("btn-top-back"),
 
@@ -110,9 +112,9 @@
     updateStatusBox: document.getElementById("update-status-box"),
 
     resumeCard: document.getElementById("resume-card"),
-    resumeText: document.getElementById("resume-text"),
-    btnResume: document.getElementById("btn-resume"),
-    btnDiscardSession: document.getElementById("btn-discard-session"),
+    resumeBadge: document.getElementById("resume-badge"),
+    resumeSubtitle: document.getElementById("resume-subtitle"),
+    resumeList: document.getElementById("resume-list"),
 
     gradesGrid: document.getElementById("grades-grid"),
     lessonsGrid: document.getElementById("lessons-grid"),
@@ -133,7 +135,9 @@
     feedbackStatus: document.getElementById("feedback-status"),
     feedbackHint: document.getElementById("feedback-hint"),
     btnNext: document.getElementById("btn-next"),
+    quizPraiseOverlay: document.getElementById("quiz-praise-overlay"),
 
+    resultSticker: document.getElementById("result-sticker"),
     resultSummary: document.getElementById("result-summary"),
     resCorrect: document.getElementById("res-correct"),
     resWrong: document.getElementById("res-wrong"),
@@ -540,9 +544,37 @@
     } catch {}
   }
 
-  // --- مدیریت حافظه پیشرفت (Stats) ---
+  // --- مدیریت حافظه پیشرفت (Stats) و فهرست آزمون‌های نیمه‌کاره ---
+  function makeSessionId(gradeId, lessonScope, mode, reviewOnly) {
+    return `${gradeId || "grade6"}::${lessonScope || "all"}::${mode || "spelling"}::${reviewOnly ? "review" : "normal"}`;
+  }
+
+  function normalizeSessionObj(s) {
+    if (!s || !Array.isArray(s.queue) || s.queue.length === 0) return null;
+    const gradeId = s.gradeId || "grade6";
+    const lessonScope = s.lessonScope || "all";
+    const mode = s.mode || "spelling";
+    const reviewOnly = Boolean(s.reviewOnly);
+    const currentIndex = Number.isInteger(s.currentIndex) && s.currentIndex >= 0 ? s.currentIndex : 0;
+    if (currentIndex >= s.queue.length) return null;
+    return {
+      id: s.id || makeSessionId(gradeId, lessonScope, mode, reviewOnly),
+      gradeId,
+      lessonScope,
+      lessonLabel: s.lessonLabel || "",
+      mode,
+      reviewOnly,
+      queue: s.queue.slice(),
+      currentIndex,
+      correctInSession: Number(s.correctInSession) || 0,
+      wrongInSession: Number(s.wrongInSession) || 0,
+      wrongIdsInSession: Array.isArray(s.wrongIdsInSession) ? s.wrongIdsInSession.slice() : [],
+      updatedAt: Number(s.updatedAt) || Date.now()
+    };
+  }
+
   function defaultState() {
-    return { version: 2, stats: {}, activeSession: null };
+    return { version: 3, stats: {}, activeSessions: [] };
   }
 
   function loadState() {
@@ -550,13 +582,62 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return defaultState();
       const parsed = JSON.parse(raw);
+      const sessions = [];
+      const seenIds = new Set();
+
+      const addUnique = (rawSess) => {
+        const clean = normalizeSessionObj(rawSess);
+        if (clean && !seenIds.has(clean.id)) {
+          seenIds.add(clean.id);
+          sessions.push(clean);
+        }
+      };
+
+      if (Array.isArray(parsed.activeSessions)) {
+        parsed.activeSessions.forEach(addUnique);
+      }
+      // مهاجرت خودکار از نسخه‌های قبلی که فقط یک activeSession ذخیره می‌کردند
+      if (parsed.activeSession) {
+        addUnique(parsed.activeSession);
+      }
+
       return {
-        version: 2,
+        version: 3,
         stats: parsed.stats && typeof parsed.stats === "object" ? parsed.stats : {},
-        activeSession: parsed.activeSession || null
+        activeSessions: sessions
       };
     } catch {
       return defaultState();
+    }
+  }
+
+  function getValidActiveSessions() {
+    if (!Array.isArray(state.activeSessions)) state.activeSessions = [];
+    return state.activeSessions
+      .filter((s) => s && Array.isArray(s.queue) && s.currentIndex < s.queue.length)
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  }
+
+  function getCurrentSession() {
+    if (!currentSessionId || !Array.isArray(state.activeSessions)) return null;
+    return state.activeSessions.find((s) => s.id === currentSessionId) || null;
+  }
+
+  function upsertActiveSession(sessionObj) {
+    if (!Array.isArray(state.activeSessions)) state.activeSessions = [];
+    const idx = state.activeSessions.findIndex((s) => s.id === sessionObj.id);
+    if (idx >= 0) {
+      state.activeSessions[idx] = sessionObj;
+    } else {
+      state.activeSessions.push(sessionObj);
+    }
+  }
+
+  function removeActiveSession(sessionId) {
+    if (!Array.isArray(state.activeSessions)) return;
+    state.activeSessions = state.activeSessions.filter((s) => s.id !== sessionId);
+    if (currentSessionId === sessionId) {
+      currentSessionId = null;
     }
   }
 
@@ -702,39 +783,44 @@
     return b.questions.filter((q) => q.lessonId === lessonId && q.sectionId === sectionId).length;
   }
 
-  // پاکسازی ایمن آزمون نیمه‌کاره پس از حذف یا جایگزینی سؤالات شخصی
+  // پاکسازی ایمن همه‌ی آزمون‌های نیمه‌کاره پس از حذف یا جایگزینی سؤالات شخصی
   function sanitizeActiveSessionAfterCustomChange() {
-    const s = state.activeSession;
-    if (!s || !Array.isArray(s.queue)) return;
+    if (!Array.isArray(state.activeSessions) || !state.activeSessions.length) return;
 
-    const gId = s.gradeId || "grade6";
-    const bucket = ensureGradeBucket(gId);
-    const validCustomIds = new Set(bucket.questions.map((q) => q.id));
+    state.activeSessions = state.activeSessions.filter((s) => {
+      if (!s || !Array.isArray(s.queue)) return false;
 
-    // حذف شناسه‌های شخصی که دیگر در حافظه وجود ندارند
-    const cleanedQueue = s.queue.filter((id) => {
-      if (String(id).startsWith("c_q_")) {
-        return validCustomIds.has(id);
+      const gId = s.gradeId || "grade6";
+      const bucket = ensureGradeBucket(gId);
+      const validCustomIds = new Set(bucket.questions.map((q) => q.id));
+
+      const cleanedQueue = s.queue.filter((id) => {
+        if (String(id).startsWith("c_q_")) {
+          return validCustomIds.has(id);
+        }
+        return true;
+      });
+
+      const isMissingCustomLesson =
+        String(s.lessonScope || "").startsWith("c_les_") &&
+        !bucket.customLessons.some((cl) => cl.id === s.lessonScope);
+
+      const isMissingCustomSection =
+        String(s.mode || "").startsWith("c_sec_") &&
+        !bucket.customSections.some((cs) => cs.id === s.mode);
+
+      if (isMissingCustomLesson || isMissingCustomSection || cleanedQueue.length === 0) {
+        if (currentSessionId === s.id) currentSessionId = null;
+        return false;
+      }
+
+      s.queue = cleanedQueue;
+      if (s.currentIndex >= s.queue.length) {
+        if (currentSessionId === s.id) currentSessionId = null;
+        return false;
       }
       return true;
     });
-
-    const isMissingCustomLesson =
-      String(s.lessonScope || "").startsWith("c_les_") &&
-      !bucket.customLessons.some((cl) => cl.id === s.lessonScope);
-
-    const isMissingCustomSection =
-      String(s.mode || "").startsWith("c_sec_") &&
-      !bucket.customSections.some((cs) => cs.id === s.mode);
-
-    if (isMissingCustomLesson || isMissingCustomSection || cleanedQueue.length === 0) {
-      state.activeSession = null;
-    } else {
-      s.queue = cleanedQueue;
-      if (s.currentIndex >= s.queue.length) {
-        state.activeSession = null;
-      }
-    }
   }
 
   // اطلاعات نمایشی هر بخش (رسمی، پیشنهادی یا دلخواه)
@@ -853,11 +939,24 @@
     toastTimer = setTimeout(() => el.toast.classList.add("hidden"), 2700);
   }
 
+  function hidePraiseOverlay() {
+    if (el.quizPraiseOverlay) {
+      el.quizPraiseOverlay.classList.add("hidden");
+    }
+  }
+
+  function showPraiseOverlay() {
+    if (el.quizPraiseOverlay) {
+      el.quizPraiseOverlay.classList.remove("hidden");
+    }
+  }
+
   function clearAutoNext() {
     if (autoNextTimer) {
       clearTimeout(autoNextTimer);
       autoNextTimer = null;
     }
+    hidePraiseOverlay();
   }
 
   function shuffle(arr) {
@@ -1139,6 +1238,17 @@
   function showView(viewName) {
     closeMobileMenu();
     currentViewName = viewName;
+
+    // هنگام ورود دانش‌آموز به مقطع/درس/آزمون، بنر پنهان می‌شود تا تمرکز حفظ شود؛ در بازگشت به مقاطع دوباره نمایش می‌یابد
+    const hideBanner =
+      viewName === "gradeHome" ||
+      viewName === "lesson" ||
+      viewName === "quiz" ||
+      viewName === "result";
+    if (el.siteBannerWrap) {
+      el.siteBannerWrap.classList.toggle("hidden", hideBanner);
+    }
+
     el.gradesView.classList.toggle("hidden", viewName !== "grades");
     el.gradeHomeView.classList.toggle("hidden", viewName !== "gradeHome");
     el.lessonView.classList.toggle("hidden", viewName !== "lesson");
@@ -1176,17 +1286,69 @@
       null
     );
 
-    const s = state.activeSession;
-    if (s && Array.isArray(s.queue) && s.currentIndex < s.queue.length) {
-      const gradeId = s.gradeId || "grade6";
-      const gradeObj = GRADES.find((g) => g.id === gradeId);
-      const gradeName = gradeObj ? gradeObj.shortTitle : "فارسی ششم";
-      const secMeta = getSectionMeta(gradeId, s.mode || "spelling");
-      const reviewTag = s.reviewOnly ? " (مرور اشتباهات)" : "";
-      el.resumeText.textContent =
-        `${gradeName} • ${secMeta.title}${reviewTag} • سؤال ${s.currentIndex + 1} از ${s.queue.length}`;
+    const sessions = getValidActiveSessions();
+    if (sessions.length > 0 && el.resumeList) {
+      if (el.resumeBadge) {
+        el.resumeBadge.textContent = sessions.length > 1
+          ? `آزمون‌های نیمه‌کاره (${toPersianDigits(sessions.length)})`
+          : "آزمون نیمه‌کاره";
+      }
+      if (el.resumeSubtitle) {
+        el.resumeSubtitle.textContent = sessions.length > 1
+          ? "می‌توانی هر یک از تمرین‌های ناتمامت را از همان‌جا ادامه دهی:"
+          : "یک تمرین ناتمام داری؛ می‌توانی از همان‌جا ادامه دهی:";
+      }
+
+      el.resumeList.innerHTML = "";
+      sessions.forEach((s) => {
+        const gradeId = s.gradeId || "grade6";
+        const gradeObj = GRADES.find((g) => g.id === gradeId);
+        const gradeName = gradeObj ? gradeObj.shortTitle : "فارسی ششم";
+        const secMeta = getSectionMeta(gradeId, s.mode || "spelling");
+        const reviewTag = s.reviewOnly ? " (مرور اشتباهات)" : "";
+        const lessonPart = s.lessonLabel
+          ? ` — ${s.lessonLabel}`
+          : (s.lessonScope === "all" ? " — همه درس‌ها" : "");
+
+        const row = document.createElement("div");
+        row.className = "resume-row";
+
+        const info = document.createElement("div");
+        info.className = "resume-row-info";
+        info.innerHTML = `
+          <span class="resume-row-title">${escapeHtml(gradeName)}${escapeHtml(lessonPart)}</span>
+          <span class="resume-row-meta">${escapeHtml(secMeta.title)}${reviewTag} • سؤال ${toPersianDigits(s.currentIndex + 1)} از ${toPersianDigits(s.queue.length)}</span>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "resume-actions";
+
+        const btnContinue = document.createElement("button");
+        btnContinue.type = "button";
+        btnContinue.className = "btn btn-primary btn-sm";
+        btnContinue.textContent = "ادامه از همین‌جا";
+        btnContinue.addEventListener("click", () => resumeSession(s.id));
+
+        const btnDiscard = document.createElement("button");
+        btnDiscard.type = "button";
+        btnDiscard.className = "btn btn-ghost btn-sm";
+        btnDiscard.textContent = "بستن";
+        btnDiscard.addEventListener("click", () => {
+          removeActiveSession(s.id);
+          saveState();
+          renderGrades();
+        });
+
+        actions.appendChild(btnContinue);
+        actions.appendChild(btnDiscard);
+        row.appendChild(info);
+        row.appendChild(actions);
+        el.resumeList.appendChild(row);
+      });
+
       el.resumeCard.classList.remove("hidden");
     } else {
+      if (el.resumeList) el.resumeList.innerHTML = "";
       el.resumeCard.classList.add("hidden");
     }
 
@@ -1442,33 +1604,42 @@
       return;
     }
 
-    state.activeSession = {
+    const sessionId = makeSessionId(activeGrade.id, selectedLesson, sectionId, reviewOnly);
+    const sessionObj = {
+      id: sessionId,
       gradeId: activeGrade.id,
       lessonScope: selectedLesson,
+      lessonLabel: getScopeLabel(selectedLesson),
       mode: sectionId,
       reviewOnly: reviewOnly,
       queue: shuffle(ids),
       currentIndex: 0,
       correctInSession: 0,
       wrongInSession: 0,
-      wrongIdsInSession: []
+      wrongIdsInSession: [],
+      updatedAt: Date.now()
     };
 
+    upsertActiveSession(sessionObj);
+    currentSessionId = sessionId;
     currentQuestionIndex = 0;
     saveState();
     renderQuestion();
     showView("quiz");
   }
 
-  function resumeSession() {
+  function resumeSession(sessionId) {
     clearAutoNext();
-    const s = state.activeSession;
-    if (!s || !Array.isArray(s.queue)) return;
+    const s = state.activeSessions.find((item) => item.id === sessionId);
+    if (!s || !Array.isArray(s.queue)) {
+      renderGrades();
+      return;
+    }
 
     const gradeId = s.gradeId || "grade6";
     const grade = GRADES.find((g) => g.id === gradeId);
     if (!grade || !grade.ready) {
-      state.activeSession = null;
+      removeActiveSession(s.id);
       saveState();
       renderGrades();
       return;
@@ -1482,14 +1653,18 @@
 
         s.queue = s.queue.filter((id) => questionMap.has(id));
         if (s.currentIndex >= s.queue.length) {
-          state.activeSession = null;
+          removeActiveSession(s.id);
           saveState();
           renderGradeHome();
           return;
         }
 
+        s.lessonLabel = getScopeLabel(s.lessonScope);
+        s.updatedAt = Date.now();
+        currentSessionId = s.id;
         selectedLesson = s.lessonScope;
         currentQuestionIndex = s.currentIndex;
+        saveState();
         renderQuestion();
         showView("quiz");
       })
@@ -1500,7 +1675,11 @@
 
   function renderQuestion() {
     clearAutoNext();
-    const s = state.activeSession;
+    const s = getCurrentSession();
+    if (!s) {
+      renderGrades();
+      return;
+    }
     const qId = s.queue[currentQuestionIndex];
     const q = questionMap.get(qId);
     if (!q) {
@@ -1574,7 +1753,8 @@
     if (isAnswered) return;
     isAnswered = true;
 
-    const s = state.activeSession;
+    const s = getCurrentSession();
+    if (!s) return;
     const allBtns = el.optionsContainer.querySelectorAll(".option-btn");
     allBtns.forEach((b) => {
       b.disabled = true;
@@ -1584,6 +1764,7 @@
     });
 
     s.currentIndex = currentQuestionIndex + 1;
+    s.updatedAt = Date.now();
 
     if (isCorrect) {
       s.correctInSession++;
@@ -1594,7 +1775,9 @@
         el.progressBar.style.width = "100%";
       }
 
+      showPraiseOverlay();
       autoNextTimer = setTimeout(() => {
+        hidePraiseOverlay();
         nextQuestion();
       }, AUTO_NEXT_DELAY_MS);
     } else {
@@ -1623,7 +1806,7 @@
 
   function nextQuestion() {
     clearAutoNext();
-    const s = state.activeSession;
+    const s = getCurrentSession();
     if (!s) return;
     currentQuestionIndex++;
     if (currentQuestionIndex >= s.queue.length) {
@@ -1635,23 +1818,41 @@
 
   function finishSession() {
     clearAutoNext();
-    const s = state.activeSession;
+    const s = getCurrentSession();
     lastFinishedSession = s ? { ...s } : null;
-    state.activeSession = null;
+    if (s) {
+      removeActiveSession(s.id);
+    }
     saveState();
 
     const total = s ? s.queue.length : 0;
     const ok = s ? s.correctInSession : 0;
     const wrong = s ? s.wrongInSession : 0;
+    const ratio = total > 0 ? ok / total : 0;
 
-    el.resCorrect.textContent = ok;
-    el.resWrong.textContent = wrong;
+    el.resCorrect.textContent = toPersianDigits(ok);
+    el.resWrong.textContent = toPersianDigits(wrong);
 
-    if (wrong === 0) {
-      el.resultSummary.textContent = `عالی بود! به همه ${total} سؤال درست پاسخ دادی.`;
-    } else {
+    if (wrong === 0 && total > 0) {
+      if (el.resultSticker) {
+        el.resultSticker.src = "images/salar_congratulations.png";
+        el.resultSticker.alt = "تبریک! موفق شدی!";
+      }
+      el.resultSummary.textContent = `عالی بود! به همه ${toPersianDigits(total)} سؤال درست پاسخ دادی.`;
+    } else if (ratio >= 0.8) {
+      if (el.resultSticker) {
+        el.resultSticker.src = "images/salar_praise.png";
+        el.resultSticker.alt = "آفرین! عالی نوشتی!";
+      }
       el.resultSummary.textContent =
-        `از ${total} سؤال به ${ok} سؤال درست پاسخ دادی. می‌توانی همین الان اشتباهاتت را دوباره تمرین کنی.`;
+        `خیلی خوب بود! از ${toPersianDigits(total)} سؤال به ${toPersianDigits(ok)} سؤال درست پاسخ دادی. می‌توانی همین الان اشتباهاتت را دوباره تمرین کنی.`;
+    } else {
+      if (el.resultSticker) {
+        el.resultSticker.src = "images/salar_encouragement.png";
+        el.resultSticker.alt = "اشکالی ندارد، دوباره تلاش کن.";
+      }
+      el.resultSummary.textContent =
+        `از ${toPersianDigits(total)} سؤال به ${toPersianDigits(ok)} سؤال درست پاسخ دادی. می‌توانی همین الان اشتباهاتت را دوباره تمرین کنی.`;
     }
 
     el.btnResultLesson.textContent =
@@ -1662,11 +1863,12 @@
 
   function backToCurrentLesson() {
     clearAutoNext();
-    const s = state.activeSession;
+    const s = getCurrentSession();
     const targetScope = s ? s.lessonScope : (selectedLesson || "all");
     if (s && s.currentIndex >= s.queue.length) {
-      state.activeSession = null;
+      removeActiveSession(s.id);
     }
+    currentSessionId = null;
     saveState();
     openLesson(targetScope);
   }
@@ -3462,8 +3664,10 @@
         (lesson.sections[secId] || []).forEach((q) => delete state.stats[q.id]);
       });
     }
-    if (state.activeSession && state.activeSession.lessonScope === lessonId) {
-      state.activeSession = null;
+    if (Array.isArray(state.activeSessions) && activeGrade) {
+      state.activeSessions = state.activeSessions.filter(
+        (s) => !(s.gradeId === activeGrade.id && s.lessonScope === lessonId)
+      );
     }
     saveState();
 
@@ -3481,8 +3685,10 @@
         (lesson.sections[secId] || []).forEach((q) => delete state.stats[q.id]);
       });
     });
-    if (state.activeSession && (state.activeSession.gradeId || "grade6") === activeGrade.id) {
-      state.activeSession = null;
+    if (Array.isArray(state.activeSessions)) {
+      state.activeSessions = state.activeSessions.filter(
+        (s) => (s.gradeId || "grade6") !== activeGrade.id
+      );
     }
     saveState();
 
@@ -3532,12 +3738,7 @@
   el.btnBackLesson.addEventListener("click", backToCurrentLesson);
   el.btnResultLesson.addEventListener("click", backToCurrentLesson);
 
-  el.btnResume.addEventListener("click", resumeSession);
-  el.btnDiscardSession.addEventListener("click", () => {
-    state.activeSession = null;
-    saveState();
-    renderGrades();
-  });
+
 
   el.btnNext.addEventListener("click", nextQuestion);
 
