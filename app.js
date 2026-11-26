@@ -2,13 +2,13 @@
   "use strict";
 
   // کلیدهای ذخیره‌سازی محلی (کاملاً مستقل از کش فایل‌های نرم‌افزار — در آپدیت‌ها حفظ می‌شوند)
-  const APP_VERSION = "2.15";
+  const APP_VERSION = "2.16";
   const YM_TAG_ID = 114682416;
   const BACKUP_META_KEY = "salar_backup_meta_v1";
   const STORAGE_KEY = "farsi6_emla_app_v1";
   const CUSTOM_STORAGE_KEY = "salar_custom_content_v1";
   const THEME_KEY = "salar_theme_v1";
-  const FONT_SCALE_KEY = "salar_font_scale_v3";
+  const FONT_SCALE_KEY = "salar_font_scale_v4";
   const POST_UPDATE_KEY = "salar_post_update_v1";
   const PWA_INSTALL_TRACKED_KEY = "salar_pwa_install_tracked_v1";
   const AUTO_NEXT_DELAY_MS = 1000;
@@ -16,7 +16,7 @@
   const MIN_FONT_SCALE = 0.7;
   const MAX_FONT_SCALE = 2.0;
   const FONT_SCALE_STEP = 0.1;
-  const MOBILE_DEFAULT_FONT_SCALE = 0.8;
+  const MOBILE_DEFAULT_FONT_SCALE = 1.0;
   const DESKTOP_DEFAULT_FONT_SCALE = 1.0;
 
   // فهرست ۶ پایه‌ی رسمی فارسی دبستان
@@ -83,6 +83,8 @@
   let isHandlingPopState = false;       // { filename, parsed, summary }
 
   const el = {
+    navbar: document.querySelector(".navbar"),
+    btnScrollTop: document.getElementById("btn-scroll-top"),
     navBrand: document.getElementById("nav-brand"),
     navLinks: document.getElementById("nav-links"),
     navBtns: document.querySelectorAll(".nav-btn"),
@@ -320,6 +322,7 @@
     if (announce) {
       showToast(`اندازه متن: ${toPersianDigits(pct)} درصد`);
     }
+    requestAnimationFrame(updateScrollTopButton);
   }
 
   // --- مدیریت تمام‌نما (Fullscreen) ---
@@ -1425,7 +1428,74 @@
     return false;
   }
 
-  function showView(viewName) {
+  // --- مدیریت هوشمند اسکرول، تثبیت قاب دید و دکمه‌ی شناور بازگشت به منوها ---
+  function isNavbarSticky() {
+    if (!el.navbar) return false;
+    try {
+      return window.getComputedStyle(el.navbar).position === "sticky";
+    } catch {
+      return window.innerWidth > 680;
+    }
+  }
+
+  function updateScrollTopButton() {
+    if (!el.btnScrollTop) return;
+    let shouldShow = false;
+    if (el.navbar && !isNavbarSticky()) {
+      // در موبایل به محض خروج نوار منو از کادر دید، دکمه‌ی فلش بازگشت به بالا ظاهر می‌شود
+      shouldShow = el.navbar.getBoundingClientRect().bottom <= 8;
+    } else {
+      // در ویندوز و نمایشگرهای عریض پس از اسکرول به پایین صفحه ظاهر می‌شود
+      shouldShow = window.scrollY > 200;
+    }
+    el.btnScrollTop.classList.toggle("hidden", !shouldShow);
+  }
+
+  function focusNoScroll(inputEl) {
+    if (!inputEl) return;
+    try {
+      inputEl.focus({ preventScroll: true });
+    } catch {
+      inputEl.focus();
+    }
+  }
+
+  function scrollToAnchor(targetEl, behavior, onlyIfMisaligned) {
+    if (!targetEl) return;
+    const stickyOffset = isNavbarSticky() && el.navbar ? (el.navbar.offsetHeight + 12) : 10;
+    const rect = targetEl.getBoundingClientRect();
+    if (onlyIfMisaligned) {
+      // اگر عنصر همین الان دقیقاً در قاب مناسب قرار دارد، اسکرول اضافی انجام نده
+      if (isNavbarSticky()) {
+        if (rect.top >= stickyOffset - 8 && rect.top <= stickyOffset + 120) return;
+      } else {
+        if (Math.abs(rect.top - stickyOffset) <= 14) return;
+      }
+    }
+    const targetTop = Math.max(0, Math.round(window.scrollY + rect.top - stickyOffset));
+    window.scrollTo({ top: targetTop, behavior: behavior || "smooth" });
+    requestAnimationFrame(updateScrollTopButton);
+  }
+
+  function anchorQuizView(behavior, onlyIfMisaligned) {
+    if (!el.quizView || el.quizView.classList.contains("hidden")) return;
+    requestAnimationFrame(() => {
+      scrollToAnchor(el.quizView, behavior || "smooth", Boolean(onlyIfMisaligned));
+    });
+  }
+
+  function anchorBuilderForm(behavior, shouldFocus) {
+    if (!el.builderFormCard || el.builderFormCard.classList.contains("hidden")) return;
+    requestAnimationFrame(() => {
+      scrollToAnchor(el.builderFormCard, behavior || "smooth", false);
+      if (shouldFocus) {
+        focusNoScroll(el.qPrompt);
+      }
+    });
+  }
+
+  function showView(viewName, options) {
+    const opts = options || {};
     currentViewName = viewName;
 
     // هنگام ورود دانش‌آموز به مقطع/درس/آزمون، بنر پنهان می‌شود تا تمرکز حفظ شود؛ در بازگشت به مقاطع دوباره نمایش می‌یابد
@@ -1448,7 +1518,10 @@
     el.aboutView.classList.toggle("hidden", viewName !== "about");
     el.namingView.classList.toggle("hidden", viewName !== "naming");
     syncHistoryState(viewName, false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!opts.skipScroll) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    requestAnimationFrame(updateScrollTopButton);
   }
 
   function configureHeader(title, tabTitle, backLabel, backHandler) {
@@ -1831,7 +1904,12 @@
     currentQuestionIndex = 0;
     saveState();
     renderQuestion();
-    showView("quiz");
+    if (!isNavbarSticky()) {
+      showView("quiz", { skipScroll: true });
+      anchorQuizView("auto", false);
+    } else {
+      showView("quiz");
+    }
   }
 
   function resumeSession(sessionId) {
@@ -1872,7 +1950,12 @@
         currentQuestionIndex = s.currentIndex;
         saveState();
         renderQuestion();
-        showView("quiz");
+        if (!isNavbarSticky()) {
+          showView("quiz", { skipScroll: true });
+          anchorQuizView("auto", false);
+        } else {
+          showView("quiz");
+        }
       })
       .catch(() => {
         showToast("خطا در بازیابی آزمون نیمه‌کاره.");
@@ -2019,6 +2102,7 @@
       finishSession();
     } else {
       renderQuestion();
+      anchorQuizView("smooth", true);
     }
   }
 
@@ -2983,7 +3067,7 @@
     if (!isHidden) {
       el.builderFormTitle.textContent = "افزودن سؤال جدید";
       el.btnSubmitQuestion.textContent = "ذخیره سؤال";
-      el.qPrompt.focus();
+      anchorBuilderForm("smooth", true);
     }
   }
 
@@ -3023,8 +3107,7 @@
     el.qWrong3.value = wrongs[2] || "";
     el.qHint.value = q.hint || "";
 
-    el.builderFormCard.scrollIntoView({ behavior: "smooth", block: "start" });
-    el.qPrompt.focus();
+    anchorBuilderForm("smooth", true);
   }
 
   function startDuplicateQuestion(q) {
@@ -3043,8 +3126,7 @@
     el.qWrong3.value = wrongs[2] || "";
     el.qHint.value = q.hint || "";
 
-    el.builderFormCard.scrollIntoView({ behavior: "smooth", block: "start" });
-    el.qPrompt.focus();
+    anchorBuilderForm("smooth", true);
     showToast("متن سؤال کپی شد؛ پس از ویرایش روی «ذخیره سؤال جدید» بزنید.");
   }
 
@@ -3120,7 +3202,7 @@
     clearQuestionFormInputs();
     updateBuilderTotalBadge();
     renderBuilderQuestionsStep();
-    el.qPrompt.focus();
+    anchorBuilderForm("auto", true);
     showToast("✅ سؤال جدید ذخیره شد.");
   }
 
@@ -4064,6 +4146,14 @@
   });
   el.btnConfirmRestore.addEventListener("click", executePendingRestore);
   el.btnCancelRestore.addEventListener("click", clearPendingRestore);
+
+  if (el.btnScrollTop) {
+    el.btnScrollTop.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+  window.addEventListener("scroll", updateScrollTopButton, { passive: true });
+  window.addEventListener("resize", updateScrollTopButton, { passive: true });
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !el.quizView.classList.contains("hidden") && isAnswered && !el.btnNext.classList.contains("hidden")) {

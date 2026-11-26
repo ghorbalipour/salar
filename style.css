@@ -1165,6 +1165,7 @@ code {
   }
 
   .navbar {
+    position: static;
     margin-bottom: 16px;
   }
 
@@ -1216,27 +1217,30 @@ code {
     font-size: 0.8rem;
   }
 
-  /* منوی تب‌مانند کنار هم — همیشه باز و قابل مشاهده زیر زیرعنوان در موبایل */
+  /* تب‌های منوی اصلی در موبایل — رشد طبیعی فونت هم‌گام با زوم و شکستن تمیز زیر هم */
   .nav-links {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 5px;
-    padding-top: 7px;
+    gap: 6px;
+    padding-top: 8px;
   }
 
   .nav-btn {
     width: auto;
+    max-width: 100%;
     text-align: center;
-    font-size: clamp(11.5px, 0.8rem, 14px);
-    padding: 6px 10px;
-    min-height: 34px;
+    font-size: clamp(13px, 0.85rem, 26px);
+    line-height: 1.4;
+    padding: 7px 12px;
+    min-height: 36px;
     border-radius: 9px 9px 4px 4px;
     border: 1px solid var(--border);
     border-bottom: 2.5px solid transparent;
     background: var(--surface-subtle);
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
   }
 
   .nav-btn.active {
@@ -2420,5 +2424,66 @@ button,
 @media (max-width: 680px) {
   .install-hero-top .btn {
     width: 100%;
+  }
+}
+
+/* ==========================================================================
+   نسخه ۲.۱۶: دکمه‌ی شناور بازگشت به منوها و تثبیت حاشیه اسکرول آزمون و طراحی سؤال
+   ========================================================================== */
+#quiz-view,
+#builder-form-card {
+  scroll-margin-top: 132px;
+}
+
+.scroll-top-btn {
+  position: fixed;
+  left: 18px;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  z-index: 60;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  background: var(--primary);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.28);
+  transition: transform 0.18s ease, background-color 0.15s ease, opacity 0.18s ease;
+}
+
+.scroll-top-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.scroll-top-btn:active {
+  transform: scale(0.94);
+}
+
+.scroll-top-btn:focus-visible {
+  outline: 3px solid var(--badge-blue-bg);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-top-btn {
+    transition: none;
+  }
+}
+
+@media (max-width: 680px) {
+  #quiz-view,
+  #builder-form-card {
+    scroll-margin-top: 10px;
+  }
+
+  .scroll-top-btn {
+    left: 14px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    width: 42px;
+    height: 42px;
   }
 }
